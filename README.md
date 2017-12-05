@@ -1,16 +1,15 @@
 ---
 title: 'Blue Hunters: Bluetooth RSSI Locator Robots'
 author:
-  - Jacob Glueck (jng55)
-  - Jane Du (zd53)
-  - Justin Cray (jgc232)
+  - Jacob Glueck ([jng55](mailto:jng55@cornell.edu))
+  - Jane Du ([zd53](mailto:zd53@cornell.edu))
+  - Justin Cray ([jgc232](mailto:jgc232@cornell.edu))
 
 date: December 6, 2017
 ---
 
 
 ## Introduction
-<!-- Give a short explanation of what was done. -->
 We built 2 small cars which used Bluetooth Received Signal Strength Indicator (RSSI) measurements to navigate towards a stationary base station.
 The cars and base station used a Bluetooth Low Energy (BLE) 4.0 module to take the measurements and a PIC32MX250 microcontroller. The cars also used a 3 axis magnetometer as as compass in order to reliably turn, as well as 2 micro 9 g servos to drive them.
 Each unit was powered with 3 AA batteries.
@@ -38,9 +37,7 @@ hardware details. Could someone else build this based on what you have written?
 Be sure to specifically reference any design or code you used from someone else.
 Things you tried which did not work -->
 
-### Hardware
-
-#### Chassis
+### Chassis
 
 The robots are made from 4 3D printed pieces: 2 wheels, the frame, and the caster in the back.
 The servos, a 3 AA battery holder, and a perfboard containing all the circuitry are mounted directly to the frame.
@@ -58,9 +55,42 @@ There are three files, `frame.scad`, `drag.scad`, and `wheel.scad`, for each of 
 The parts were printed in ABS using [Maker Select 3D Printer v2](https://www.monoprice.com/product?c_id=107&cp_id=10724&cs_id=1072403&p_id=13860&seq=1&format=2) printers. All parts were printed
 with a layer height of 0.3 mm, as there was no need for a smooth finish or high tolerances. The parts where sliced with [Cura](https://ultimaker.com/en/products/ultimaker-cura-software).
 
-#### Electronics
+### Electronics
 
-TODO
+#### Bluetooth modules
+
+The HM-10 bluetooth modules we bought off Ebay were fakes: they were not made by Jnhuamao, and did not come with genuine Jnhuamao firmware.
+Initially, we tried to use these chips, but quickly discovered that they did not behave according to the Jnhuamao data sheet (see [the data sheets section](#data-sheets)).
+As the hardware on the fake chips is the same as that of the genuine chips, minus an external crystal.
+However, the genuine firmware checks for the presence of the crystal, and works even without it. [^arduinoforums]
+As such, we reprogrammed the chips with the genuine firmware according to an [Arduino forum post](http://forum.arduino.cc/index.php?topic=393655.msg2709528#msg2709528):
+
+1.  We soldered wires to the programming pins on the breakout boards, and connected those pins to an [Arduino Teensy 3.2](https://www.pjrc.com/teensy/teensy31.html).
+    We chose a Teensy because it is 3.3 V as opposed to 5, which would damage the CC2541.
+
+    The pins were connected as follows:
+
+      | Name          | CC2541 Pin | Arduino Pin |
+      | ------------- | ---        | ----------- |
+      | `DEBUG_CLOCK` | 7          | 5           |
+      | `DEBUG_DATA`  | 8          | 6           |
+      | `RESET_N`     | 11         | 4           |
+
+    The layout of the HM-10 board is:
+
+    ![](hm10_pins.png)
+2.  We uploaded the [`CCLoader.ino` sketch](https://github.com/RedBearLab/CCLoader/blob/master/Arduino/CCLoader/CCLoader.ino) to the Arduino.
+3.  Finally, we ran (in a Windows Virtual Machine) [`CCLoader.exe`](https://github.com/RedBearLab/CCLoader/tree/master/Windows).
+    This program takes 3 arguments:
+    ```bash
+    CCLoader.exe <COM Port> <Firmware.bin> 0
+    ```
+    The firmware file came from the same Arduino form post, and can be found [here](http://forum.arduino.cc/index.php?action=dlattach;topic=393655.0;attach=183702).
+
+There is also an excellent [YouTube video](https://www.youtube.com/watch?v=ez3491-v8Og), which explains the firmware flashing process.
+
+
+[^arduinoforums]: <http://forum.arduino.cc/index.php?topic=393655.msg2709528#msg2709528>
 
 
 ### Software
@@ -150,40 +180,48 @@ Each file can also be found below:
 *   [`config_1_2_2.h`](generated/config_1_2_2.h.html)
 
 
-### Appendix C
+### Appendix C: Schematics
 with schematics (you can download free software from expresspcb.com to draw schematics)
 A block diagram is not a schematic.
 
-### Appendix D
-with cost details with all part numbers, vendors, and their price. This cost will include components as described in the Budget Considerations section.
+### Appendix D: Bill Of Materials
 
 | Name                     | Manufacturer Part Number | Vendor          | Vendor Part Number          | Quantity          | Unit Cost | Total Cost |
-| ------------------------ | ------------------------ | --------------- | --------------------------- | ----------------- | --------- | ---------- |
+|------------------------| ------------------------| ---------------|---------------------------|-----------------|---------|----------|
 | BLE 4.0 Module (TI CC2541)   | HM-10   | [Ebay](https://www.ebay.com/itm/AT-09-BLE-Bluetooth-4-0-Uart-Transceiver-Module-CC2541-Central-Switching-HM-10/142425748901?ssPageName=STRK%3AMEBIDX%3AIT&_trksid=p2057872.m2749.l2649)  | 142425748901  | 3 | $3.99  | $11.97  |
 | FEETECH FS90R  (pack of 2) Continuous Rotation Robotic Servo | FS90R  | Amazon | B074BFQC3Q  | 2  | $12.39  | $24.78  |
 | Small board | -- | Lab rental | -- | 3 | $5.00 | $15.00 |
 | PIC32MX250F128B | PIC32MX250F128B | Lab rental | -- | 3 | $5.00 | $15.00 |
 | 6-inch Protoboard | -- | Lab rental | -- | 3 | $2.50 | $7.50 |
 
-### Appendix E
-Appendix with a list of the specific tasks in the project carried out by each team member.
+### Appendix E: Work Distribution
+
+*   **Jacob:**
+    *    hi
+*   **Jane:**
+    *    hi
+*   **Justin:**
+    *    hi
 
 ### References
 
-Data sheets
+#### Data sheets
 
-*   [MPU-9250](https://www.invensense.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf) and [its register map](https://cdn.sparkfun.com/assets/learn_tutorials/5/5/0/MPU-9250-Register-Map.pdf)
-*   [3-axis Electronic Compass on IMU](https://www.akm.com/akm/en/file/datasheet/AK8963C.pdf)
+*   [MPU-9250](https://www.invensense.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf) and [its register map](https://cdn.sparkfun.com/assets/learn_tutorials/5/5/0/MPU-9250-Register-Map.pdf).
+*   [3-axis Electronic Compass on IMU](https://www.akm.com/akm/en/file/datasheet/AK8963C.pdf).
+*   [HM-10 (Bluetooth breakout module & firmware)](http://www.jnhuamao.cn/bluetooth40_en.zip). The ZIP contains the original data sheet, as well as other documentation. [MIT has a PDF](http://fab.cba.mit.edu/classes/863.15/doc/tutorials/programming/bluetooth/bluetooth40_en.pdf) available, which may me out of date, but is easier to get to.
+*   [PIC32MX250](http://ww1.microchip.com/downloads/en/DeviceDoc/60001168J.pdf).
 
 
-Vendor sites
+#### Vendor sites
 
 
-Code/designs borrowed from others
+#### Code/designs borrowed from others
 
 *   [Self-Balancing Robot](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/index.html) by Desmond Caulley (dc686@cornell.edu), Nadav Nehoran (nn233@cornell.edu), Sherry Zhao (hz263@cornell.edu). In particular, we borrowed extensively from their [i2c_helper.h](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/dc686_nn233_hz263/i2c_helper.h).
 
-Background sites/paper
+#### Background sites/paper
 
+#### Other
 
 Template: <https://github.com/tajmone/pandoc-goodies/tree/af492fc217a95485ff73fc834ff2cd4fb7bd7148/templates/html5/github>
