@@ -1,3 +1,3 @@
 use <main.scad>;
 
-robot();
+drag();

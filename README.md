@@ -38,6 +38,12 @@ Things you tried which did not work -->
 
 ### Hardware
 
+#### Robot Design
+
+![](report/frame.png)
+![](report/drag.png)
+![](report/wheel.png)
+
 ### Software
 
 ```cpp
