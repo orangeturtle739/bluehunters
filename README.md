@@ -16,8 +16,10 @@ The cars and base station used a Bluetooth Low Energy (BLE) 4.0 module to take t
 Each unit was powered with 3 AA batteries.
 Finally, the chassis and wheels of each car were 3D printed.
 
+### Video
 
-![bob](http://www.asciify.net/ascii/thumb/3585/minon.png)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/g5H4cLJBA_Q?rel=0" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
 
 ## Design
 <!-- Explain the approach you used for both software and hardware aspects of the assignment.
@@ -38,7 +40,13 @@ Things you tried which did not work -->
 
 ### Hardware
 
-#### Robot Design
+#### Chassis
+
+The robots are made from 4 3D printed pieces: 2 wheels, the frame, and the caster in the back.
+The servos, a 3 AA battery holder, and a perfboard containing all the circuitry are mounted directly to the frame.
+
+The robots where designed in [OpenSCAD](http://www.openscad.org/), and their source code is available in [our git repository](https://github.com/orangeturtle739/bluehunters/tree/master/cad).
+There are three files, `frame.scad`, `drag.scad`, and `wheel.scad`, for each of the three parts. The following renderings show each part:
 
 ![Robot chassis](report/frame.png){ width=50% }
 
@@ -46,14 +54,25 @@ Things you tried which did not work -->
 
 ![Robot wheel](report/wheel.png){ width=50% }
 
+
+The parts were printed in ABS using [Maker Select 3D Printer v2](https://www.monoprice.com/product?c_id=107&cp_id=10724&cs_id=1072403&p_id=13860&seq=1&format=2) printers. All parts were printed
+with a layer height of 0.3 mm, as there was no need for a smooth finish or high tolerances. The parts where sliced with [Cura](https://ultimaker.com/en/products/ultimaker-cura-software).
+
+#### Electronics
+
+TODO
+
+
 ### Software
 
-```cpp
-template <typename T>
-void fun(const T& bar) {
-  bar.foo();
-}
-```
+The robots were programmed in C, using the [MPLAB X IDE](http://www.microchip.com/mplab/mplab-x-ide) v4.0, with the [XC32](http://www.microchip.com/mplab/compilers) v1.4 compiler and the [PIC 32 Legacy Peripheral Library (plib)](http://www.microchip.com/SWLibraryWeb/product.aspx?product=PIC32%20Peripheral%20Library). The full source code is available in [our git repository](https://github.com/orangeturtle739/bluehunters/tree/master/ble.X). The code is divided into 4 main units:
+
+*   [`ble.c`](https://github.com/orangeturtle739/bluehunters/blob/master/ble.X/ble.c): contains all the functions for interacting with the BLE device over UART.
+*   [`imu.c`](https://github.com/orangeturtle739/bluehunters/blob/master/ble.X/imu.c): contains all the functions for interacting with the IMU (which contained the magnetometer) over I2C.
+*   [`servo.c`](https://github.com/orangeturtle739/bluehunters/blob/master/ble.X/servo.c): contains all the functions for interacting with the servos using PWM.
+*   [`pt_cornell_1_2_2.c`](https://github.com/orangeturtle739/bluehunters/blob/master/ble.X/pt_cornell_1_2_2.c): contains the functions which were originally declared in the protothreads header file.
+    However, since they were in the header file, if multiple source files included the header file, there would be linking errors due to duplicate definitions of symbols.
+    Moving the protothreads functions to a separate file resolved this issue.
 
 ## Documentation
 <!-- Include here drawings and program listings, together with any explanatory comments needed. -->
@@ -90,12 +109,6 @@ Ethical considerations. Refering to the IEEE Code of Ethics, specifically explai
 
 ## Appendix
 
-<!-- Legal considerations. For instance, if you use a transmitter, you must discuss the appropriate FCC legal restrictions. -->
-
-_The group approves this report for inclusion on the course website._
-
-_The group approves the video for inclusion on the course youtube channel._
-
 TOOD LINK TO PUBLIC GITHUB
 
 <!-- Appendix with commented program listing
@@ -111,13 +124,20 @@ Background sites/paper -->
 
 ## Appendices
 
-### Appendix A
+### Appendix A: Legal Considerations
 
 The group approves this report for inclusion on the course website.
 
 The group approves the video for inclusion on the course youtube channel.
 
-### Appendix B
+<!-- Legal considerations. For instance, if you use a transmitter, you must discuss the appropriate FCC legal restrictions. -->
+TODO: transmitter
+
+### Appendix B: Source Listing
+Our source code can be found on Github,
+
+![bob](ble.X/ble.c)
+
 with commented program listing
 
 ### Appendix C
