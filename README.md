@@ -107,5 +107,43 @@ Vendor sites
 Code/designs borrowed from others
 Background sites/paper -->
 
+## Appendices
+
+### Appendix A
+
+The group approves this report for inclusion on the course website.
+
+The group approves the video for inclusion on the course youtube channel.
+
+### Appendix B
+with commented program listing
+
+### Appendix C
+with schematics (you can download free software from expresspcb.com to draw schematics)
+A block diagram is not a schematic.
+
+### Appendix D
+with cost details with all part numbers, vendors, and their price. This cost will include components as described in the Budget Considerations section.
+
+### Appendix E
+Appendix with a list of the specific tasks in the project carried out by each team member.
+
+### References
+
+Data sheets
+
+*   [MPU-9250](https://www.invensense.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf) and [its register map](https://cdn.sparkfun.com/assets/learn_tutorials/5/5/0/MPU-9250-Register-Map.pdf)
+*   [3-axis Electronic Compass on IMU](https://www.akm.com/akm/en/file/datasheet/AK8963C.pdf)
+
+
+Vendor sites
+
+
+Code/designs borrowed from others
+
+*   [Self-Balancing Robot](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/index.html) by Desmond Caulley (dc686@cornell.edu), Nadav Nehoran (nn233@cornell.edu), Sherry Zhao (hz263@cornell.edu). In particular, we borrowed extensively from their [i2c_helper.h](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/dc686_nn233_hz263/i2c_helper.h).
+
+Background sites/paper
+
 
 Template: <https://github.com/tajmone/pandoc-goodies/tree/af492fc217a95485ff73fc834ff2cd4fb7bd7148/templates/html5/github>
