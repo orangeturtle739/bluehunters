@@ -59,7 +59,7 @@ with a layer height of 0.3 mm, as there was no need for a smooth finish or high 
 
 #### Bluetooth modules
 
-The HM-10 bluetooth modules we bought off Ebay were fakes: they were not made by Jnhuamao, and did not come with genuine Jnhuamao firmware.
+The HM-10 bluetooth modules we bought off Ebay were fakes: they were not made by Jnhuamao [^china], and did not come with genuine Jnhuamao firmware.
 Initially, we tried to use these chips, but quickly discovered that they did not behave according to the Jnhuamao data sheet (see [the data sheets section](#data-sheets)).
 As the hardware on the fake chips is the same as that of the genuine chips, minus an external crystal.
 However, the genuine firmware checks for the presence of the crystal, and works even without it. [^arduinoforums]
@@ -80,7 +80,7 @@ As such, we reprogrammed the chips with the genuine firmware according to an [Ar
 
     ![](hm10_pins.png)
 2.  We uploaded the [`CCLoader.ino` sketch](https://github.com/RedBearLab/CCLoader/blob/master/Arduino/CCLoader/CCLoader.ino) to the Arduino.
-3.  Finally, we ran (in a Windows Virtual Machine) [`CCLoader.exe`](https://github.com/RedBearLab/CCLoader/tree/master/Windows).
+3.  Finally, we ran (in a Windows virtual machine) [`CCLoader.exe`](https://github.com/RedBearLab/CCLoader/tree/master/Windows).
     This program takes 3 arguments:
     ```bash
     CCLoader.exe <COM Port> <Firmware.bin> 0
@@ -90,7 +90,25 @@ As such, we reprogrammed the chips with the genuine firmware according to an [Ar
 There is also an excellent [YouTube video](https://www.youtube.com/watch?v=ez3491-v8Og), which explains the firmware flashing process.
 
 
-[^arduinoforums]: <http://forum.arduino.cc/index.php?topic=393655.msg2709528#msg2709528>
+After flashing genuine firmware onto the chip, the next step was to update the firmware to the latest version.
+The firmware flashed onto the board was version 540, but Jnhuamao had (at the time we did this project) [released version 603](http://www.jnhuamao.cn/rom/HMSoft-10-2541-V603.zip). [^firmware]
+They also provide [instructions on how to upgrade the firmware](http://www.jnhuamao.cn/HowToUpgradeFirmware_en.zip). The basic process is:
+
+1.  Connect the HM-10 module to a computer using a 3.3 V FTDI to USB adapter.
+    Then, use PUTTY to establish a serial session (9600 baud, 8N1).
+    Send the chip `AT`; if it is connected properly, it will respond with `OK`.
+2.  Send the chip `AT+SBLUP` to put it in firmware update mode.
+    It will respond with `OK+SBLUP`. Terminate the PUTTY session.
+3.  Run the `HMSoft.exe` program distributed in the firmware update download.
+    We ran it in a Windows virtual machine because we did not trust it.
+4.  Select the proper port and firmware file using the software, and hit "Load Image".
+    The software should handle the rest!
+5.  To make sure it worked, establish a serial connection again using PUTTY.
+    Send `AT+VERS?` to query the chip for version information.
+
+[^china]: Jnhuamao is the company which makes the HM-10 module, along with other Bluetooth modules. Their English website is: <http://www.jnhuamao.cn/bluetooth.asp?id=1>.
+[^arduinoforums]: <http://forum.arduino.cc/index.php?topic=393655.msg2709528#msg2709528>.
+[^firmware]: Jnhuamao's firmware download page <http://www.jnhuamao.cn/download_rom_en.asp?id=1#>.
 
 
 ### Software
