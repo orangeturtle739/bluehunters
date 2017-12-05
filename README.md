@@ -127,6 +127,11 @@ A block diagram is not a schematic.
 ### Appendix D
 with cost details with all part numbers, vendors, and their price. This cost will include components as described in the Budget Considerations section.
 
+| Name                     | Manufacturer Part Number | Vendor          | Vendor Part Number          | Quantity          | Unit Cost | Total Cost |
+| ------------------------ | ------------------------ | --------------- | --------------------------- | ----------------- | --------- | ---------- |
+| BLE 4.0 Module (TI CC2541)   | HM-10   | [Ebay](https://www.ebay.com/itm/AT-09-BLE-Bluetooth-4-0-Uart-Transceiver-Module-CC2541-Central-Switching-HM-10/142425748901?ssPageName=STRK%3AMEBIDX%3AIT&_trksid=p2057872.m2749.l2649)  | 142425748901  | 3 | $3.99  | $11.97  |
+| FEETECH FS90R  (pack of 2) Continuous Rotation Robotic Servo | FS90R  | Amazon | B074BFQC3Q  | 2  | $12.39  | $24.78  |
+
 ### Appendix E
 Appendix with a list of the specific tasks in the project carried out by each team member.
 
