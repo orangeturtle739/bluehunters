@@ -1,10 +1,13 @@
 #! /bin/bash
 
-mkdir -p generated
+set -e
 
-for f in ble.X/*.c; do
+mkdir -p generated
+mkdir -p report/generated
+
+for f in ble.X/*.{c,h}; do
   TARGET_MD="generated/$(basename $f).md"
-  TARGET_HTML="report/$(basename $f).html"
+  TARGET_HTML="report/generated/$(basename $f).html"
   rm -f $TARGET_MD
   rm -f $TARGET_HTML
   echo "---" >> $TARGET_MD

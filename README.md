@@ -126,19 +126,29 @@ Background sites/paper -->
 
 ### Appendix A: Legal Considerations
 
-The group approves this report for inclusion on the course website.
+*   The group approves this report for inclusion on the course website.
+*   The group approves the video for inclusion on the course youtube channel.
+*   The TI CC2541 meets FCC CFR47 the Part 15 requirements. [^tidatasheet]
 
-The group approves the video for inclusion on the course youtube channel.
+[^tidatasheet]: See the top of page 8 of <http://www.ti.com/lit/ds/symlink/cc2541.pdf> for compliance information.
 
-<!-- Legal considerations. For instance, if you use a transmitter, you must discuss the appropriate FCC legal restrictions. -->
-TODO: transmitter
 
 ### Appendix B: Source Listing
-Our source code can be found on Github,
+Our source code can be found [on Github](https://github.com/orangeturtle739/bluehunters).
+Each file can also be found below:
 
-![bob](ble.X/ble.c)
+*   [`ble.c`](generated/ble.c.html)
+*   [`ble.h`](generated/ble.h.html)
+*   [`imu.c`](generated/imu.c.html)
+*   [`imu.h`](generated/imu.h.html)
+*   [`servo.c`](generated/servo.c.html)
+*   [`servo.h`](generated/servo.h.html)
+*   [`pt_cornell_1_2_2.c`](generated/pt_cornell_1_2_2.c.html)
+*   [`pt_cornell_1_2_2.h`](generated/pt_cornell_1_2_2.h.html)
+*   [`main.c`](generated/main.c.html)
+*   [`main.h`](generated/main.h.html)
+*   [`config_1_2_2.h`](generated/config_1_2_2.h.html)
 
-with commented program listing
 
 ### Appendix C
 with schematics (you can download free software from expresspcb.com to draw schematics)
