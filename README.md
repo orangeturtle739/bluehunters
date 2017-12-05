@@ -40,9 +40,11 @@ Things you tried which did not work -->
 
 #### Robot Design
 
-![](report/frame.png)
-![](report/drag.png)
-![](report/wheel.png)
+![Robot chassis](report/frame.png){ width=50% }
+
+![Caster wheel on back of robot](report/drag.png){ width=50% }
+
+![Robot wheel](report/wheel.png){ width=50% }
 
 ### Software
 

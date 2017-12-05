@@ -12,4 +12,4 @@ report/frame.png: cad/frame.scad cad/main.scad
 report/drag.png: cad/drag.scad cad/main.scad
 	openscad --render --imgsize 1600,1200 -o report/drag.png cad/drag.scad
 report/wheel.png: cad/wheel.scad cad/main.scad
-	openscad --render --imgsize 1600,1200 -o report/wheel.png cad/wheel.scad
+	openscad --render --imgsize 1600,1200 --camera 0,0,0,40,0,25,240 -o report/wheel.png cad/wheel.scad
