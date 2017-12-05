@@ -140,6 +140,31 @@ how you enforced safety in the design.
 interference with other people's designs (e.g. cpu noise, RF interference).
 usability by you and other people (perhaps with special needs). -->
 
+In most cases, at least 1 of the 2 robots successfully making it to the base station. However, it was not as reliable as we initially hoped. One of the main reasons for this was the noise in RSSI measurements.
+
+We expected that RSSI would vary with distance according to the following relation:
+
+$$\text{RSSI} = A - 10 n \log(d)$$
+
+where $A$ and $n$ are RF propagation parameters in dBm, $d$ is distance in meters, and RSSI is the measured RSSI in dBm. [^signalstrength]
+We experimented with RSSI measurements to determine how well they worked by taking 2 Bluetooth modules, and measuring the RSSI while changing the distance between them.
+One remained stationary on the floor, and the other we moved away from it, 1 floor tile (each floor tile is a 1 foot square) at a time.
+At each point, we took 3 RSSI measurements and averaged them. The graph below displays the results:
+
+![](rssi-chart.png)
+
+While the chip reported RSSI in units proportional to dBm, and we measured distances in feet, not meters, we could still use the above formula without worrying about unit conversions.
+The constants $A$ and $n$, provided we determined them empirically based on the data, would encode the conversions.
+As such, we fit the data using the above formula with $A=-48$ and $n=3$, resulting in the blue curve above.
+While the general shape of the curve matches, there is significant noise in the averaged RSSI data.
+Furthermore, when we tried to reproduce the measurements, we could not do so accurately -- it seemed to even depend on where our feet where!
+
+[^signalstrength]: L. Peneda, A. Azenha and A. Carvalho, "Trilateration for indoors positioning within the framework of wireless communications," 2009 35th Annual Conference of IEEE Industrial Electronics, Porto, 2009, pp. 2732-2737.
+
+    doi: 10.1109/IECON.2009.5415423
+
+    URL: <http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=5415423&isnumber=5414636>
+
 ## Conclusions
 <!-- Useability, what you might have done differently, etc. Any comments concerning the assignment, including suggestions for improvement, excuses, and complaints. -->
 <!-- Conclusions:
