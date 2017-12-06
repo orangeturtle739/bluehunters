@@ -192,9 +192,9 @@ Initializing the IMU involves opening the I2C module, and then configuring the I
     We open it with the baud rate generator value `BRG = (Fpb / 2 / baudrate) - 2 = 4e7 / 2 / 4e5 - 2 = 48`, as specified for `OpenI2C2()` in the [peripheral libraries](#references).
 2.  Pass through is enabled, interrupts for data ready are enabled, the IMU as an I2C master function is disabled, and the sensor is powered up.
 
-This enables the PIC to talk to the AK8963. The AK8963 has several modes of operation, and the chip must be set to power-down mode before switching to other modes. We read the IMU with single measurement mode, as specified below:
+This enables the PIC to talk to the AK8963. The AK8963 has several modes of operation, and the chip must be set to power-down mode before switching to other modes. We read compass values with single measurement mode, as specified below:
 
-![IMU single measurement mode](imu_single_measurement.png)
+![](imu_single_measurement.png)
 
 1.  Set the compass to single measurement mode in 14 bit resolution.
 2.  Read the 6 data registers (X low, X high, Y low, Y high, Z low, Z high)
@@ -231,11 +231,11 @@ The updated versions of protothreads can be found in [Appendix B](#appendix-b).
 
 #### Gradient Descent
 
-The algorithm for deciding what path to follow is a basic version of gradient descent. The following image represents the decision-making fsm, where the starting state is **Measure rssi twice, take average**.
+The algorithm for deciding what path to follow is a basic version of gradient descent. The following image represents the decision-making state machine, where the starting state is **Measure rssi twice, take average**.
 
 ![](grad_desc.png)
 
-We also implemented and tested the following improved version that allows for correction; a car that has just moved forward and detected a weakened signal does not know whether the beacon to its left or right. If after turning, the signal is still weaker, it has picked the wrong turn. This decision process corrects this:
+We also implemented and tested the following improved version that allows for correction; a car that has just moved forward and detected a weakened signal does not know whether the beacon to its left or right. If after turning, the signal is still weaker, it has picked the wrong turn. This decision process corrects this (same starting state: **Measure rssi twice, take average**):
 
 ![](turn_correction.png)
 
@@ -281,7 +281,7 @@ how you enforced safety in the design.
 interference with other people's designs (e.g. cpu noise, RF interference).
 usability by you and other people (perhaps with special needs). -->
 
-In most cases, at least 1 of the 2 robots successfully making it to the base station. However, it was not as reliable as we initially hoped. One of the main reasons for this was the noise in RSSI measurements.
+In most cases, at least 1 of the 2 robots successfully made it to the base station. However, it was not as reliable as we initially hoped. One of the main reasons for this was the noise in RSSI measurements.
 
 We expected that RSSI would vary with distance according to the following relation:
 
