@@ -211,7 +211,8 @@ In order to calibrate the compass, the robots spun in place when powered on. The
 
 #### Servos
 
-TODO JUSTIN WRITE ABOUT THE SERVOS
+For the drive systems, we used the FS90R servos. These servos are continuous rotation servos with a stall torque of 1.5 kg-cm. Continuous rotation servos operate based on PWM duty cycle. A 50% duty cycle means the servos are still. A less than 50% duty cycle means the servo turns clockwise and a greater than 50% duty cycle means the servo turns counter-clockwise. To implement the PWM, we use the output capture on the PIC. We set the duty cycle using the built in timers. We set a max and min duty cycle value which were experimentally derived. The middle point is the average of the two. Tank drive is used to control the system where both wheels are driven forward or point turns where one wheel is turned in one direction and one is turned in the other direction. 
+
 
 #### Protothreads
 
