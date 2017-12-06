@@ -1,5 +1,6 @@
 ---
 title: 'Blue Hunters: Bluetooth RSSI Locator Robots'
+subtitle: '_ECE 4760, Fall 2017_'
 author:
   - Jacob Glueck ([jng55](mailto:jng55@cornell.edu))
   - Jane Du ([zd53](mailto:zd53@cornell.edu))
