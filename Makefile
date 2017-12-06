@@ -3,7 +3,7 @@ TEMPLATE = "https://raw.githubusercontent.com/tajmone/pandoc-goodies/2e29e9cd54b
 .PHONY: clean
 
 report/report.html: README.md report/GitHub.html5 renderings/frame.png renderings/drag.png renderings/wheel.png report/generated report/stl | report
-	pandoc README.md --template report/GitHub.html5 --resource-path=assets:renderings --self-contained --toc --toc-depth 3 -r markdown+yaml_metadata_block+footnotes+pipe_tables -t html -s -o report/report.html
+	pandoc README.md --template report/GitHub.html5 --resource-path=assets:renderings --self-contained --toc --toc-depth 4 -r markdown+yaml_metadata_block+footnotes+pipe_tables -t html -s -o report/report.html
 report/GitHub.html5: | report
 	rm -f report/GitHub.html5 && wget $(TEMPLATE) -O report/GitHub.html5
 clean:
