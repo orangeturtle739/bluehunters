@@ -45,11 +45,11 @@ The servos, a 3 AA battery holder, and a perfboard containing all the circuitry 
 The robots where designed in [OpenSCAD](http://www.openscad.org/), and their source code is available in [our git repository](https://github.com/orangeturtle739/bluehunters/tree/master/cad).
 There are three files, `frame.scad`, `drag.scad`, and `wheel.scad`, for each of the three parts. The following renderings show each part:
 
-![Robot chassis](report/frame.png){ width=50% }
+![Robot chassis](frame.png){ width=50% }
 
-![Caster wheel on back of robot](report/drag.png){ width=50% }
+![Caster wheel on back of robot](drag.png){ width=50% }
 
-![Robot wheel](report/wheel.png){ width=50% }
+![Robot wheel](wheel.png){ width=50% }
 
 
 The parts were printed in ABS using [Maker Select 3D Printer v2](https://www.monoprice.com/product?c_id=107&cp_id=10724&cs_id=1072403&p_id=13860&seq=1&format=2) printers. All parts were printed
@@ -215,10 +215,7 @@ Are there patent opportunites for your project?
 Are there publishing opportunities for your project?
 Ethical considerations. Refering to the IEEE Code of Ethics, specifically explain how decisions you made or actions you took in this project were consistent with this Code of Ethics. I expect at least 200 words on this topic. A bulleted list will not be acceptable. -->
 
-
-## Appendix
-
-TOOD LINK TO PUBLIC GITHUB
+## Appendices
 
 <!-- Appendix with commented program listing
 Appendix with schematics (you can download free software from expresspcb.com to draw schematics)
@@ -230,8 +227,6 @@ Data sheets
 Vendor sites
 Code/designs borrowed from others
 Background sites/paper -->
-
-## Appendices
 
 ### Appendix A: Legal Considerations
 
@@ -281,7 +276,7 @@ A block diagram is not a schematic.
 | Name                     | Manufacturer Part Number | Vendor          | Vendor Part Number          | Quantity          | Unit Cost | Total Cost |
 |------------------------| ------------------------| ---------------|---------------------------|-----------------|---------|----------|
 | BLE 4.0 Module (TI CC2541)   | HM-10   | [Ebay](https://www.ebay.com/itm/AT-09-BLE-Bluetooth-4-0-Uart-Transceiver-Module-CC2541-Central-Switching-HM-10/142425748901?ssPageName=STRK%3AMEBIDX%3AIT&_trksid=p2057872.m2749.l2649)  | 142425748901  | 3 | $3.99  | $11.97  |
-| FEETECH FS90R  (pack of 2) Continuous Rotation Robotic Servo | FS90R  | Amazon | B074BFQC3Q  | 2  | $12.39  | $24.78  |
+| FEETECH FS90R  (pack of 2) Continuous Rotation Robotic Servo | FS90R  | [Amazon](https://www.amazon.com/gp/product/B074BFQC3Q/ref=oh_aui_detailpage_o06_s00?ie=UTF8&psc=1) | B074BFQC3Q  | 2  | $12.39  | $24.78  |
 | Small board | -- | Lab rental | -- | 3 | $5.00 | $15.00 |
 | PIC32MX250F128B | PIC32MX250F128B | Lab rental | -- | 3 | $5.00 | $15.00 |
 | 6-inch Protoboard | -- | Lab rental | -- | 3 | $2.50 | $7.50 |
@@ -289,11 +284,16 @@ A block diagram is not a schematic.
 ### Appendix E: Work Distribution
 
 *   **Jacob:**
-    *    hi
+    *   Bluetooth firmware hacking
+    *   Bluetooth UART code
+    *   CAD design & 3D printing
 *   **Jane:**
-    *    hi
+    *   I2C IMU code
+    *   Robot motion code and gradient descent algorithm
 *   **Justin:**
-    *    hi
+    *   Servo control code
+    *   Board assembly (3 small boards and our 3 of our protoboards)
+    *   Schematic
 
 ### References
 
@@ -304,16 +304,10 @@ A block diagram is not a schematic.
 *   [HM-10 (Bluetooth breakout module & firmware)](http://www.jnhuamao.cn/bluetooth40_en.zip). The ZIP contains the original data sheet, as well as other documentation. [MIT has a PDF](http://fab.cba.mit.edu/classes/863.15/doc/tutorials/programming/bluetooth/bluetooth40_en.pdf) available, which may me out of date, but is easier to get to.
 *   [PIC32MX250](http://ww1.microchip.com/downloads/en/DeviceDoc/60001168J.pdf).
 
-
-#### Vendor sites
-
-
 #### Code/designs borrowed from others
 
 *   [Self-Balancing Robot](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/index.html) by Desmond Caulley (dc686@cornell.edu), Nadav Nehoran (nn233@cornell.edu), Sherry Zhao (hz263@cornell.edu). In particular, we borrowed extensively from their [i2c_helper.h](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/dc686_nn233_hz263/i2c_helper.h).
 
-#### Background sites/paper
-
 #### Other
 
-Template: <https://github.com/tajmone/pandoc-goodies/tree/af492fc217a95485ff73fc834ff2cd4fb7bd7148/templates/html5/github>
+Website template: <https://github.com/tajmone/pandoc-goodies/tree/master/templates/html5/github>
