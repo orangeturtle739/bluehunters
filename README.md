@@ -150,14 +150,12 @@ This enables the PIC to talk to the AK8963. The AK8963 has in several modes of o
 
 ![IMU single measurement mode](imu_single_measurement.png)
 
-1. First set the compass to single measurement mode in 14 bit resolution.
+1. Set the compass to single measurement mode in 14 bit resolution.
 2. Read the 6 data registers (X low, X high, Y low, Y high, Z low, Z high)
 3. Read the Status 2 register to check for magnetic sensor overflow. Without reading this register, the read is not considered complete and further reads will fail.
-4. Wait; if the IMU is read too frequently, it will not have enough time to take measurements..
+4. Wait; if the IMU is read too frequently, it will not have enough time to take measurements.
 
-Additional helper methods used in I2C were defined in [`imu.c`](generated/imu.c.html):
-
-* `i2c_read_device(char device, char address)` Reads the data from a single register at `address`
+Additional helper methods used in I2C were defined in [`imu.c`](generated/imu.c.html):`dress)` Reads the data from a single register at `address`
 * `i2c_write_byte(char device, char address, char data)` All configurations used in this project involved writing single bytes of data.
 * `i2c_wait(int cnt)` Writes 2 nops; reads require time to return a value, and calling reads consecutively 
 
