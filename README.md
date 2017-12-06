@@ -289,7 +289,7 @@ $$\text{RSSI} = A - 10 n \log(d)$$
 
 where $A$ and $n$ are RF propagation parameters in dBm, $d$ is distance in meters, and RSSI is the measured RSSI in dBm. [^signalstrength]
 We experimented with RSSI measurements to determine how well they worked by taking 2 Bluetooth modules, and measuring the RSSI while changing the distance between them.
-One remained stationary on the floor, and the other we moved away from it, 1 floor tile (each floor tile is a 1 foot square) at a time.
+One remained stationary on the floor and the other was moved away from it 1 floor tile (each floor tile is a 1 foot square) at a time.
 At each point, we took 3 RSSI measurements and averaged them. The graph below displays the results:
 
 ![](rssi-chart.png)
@@ -332,8 +332,8 @@ We did not reverse-engineer any technology, and did not encounter any issues wit
 
 There are many potential avenues for improvements or further development. In addition to more circumstantial difficulties encountered during the project work period (such as extremely uneven servos), two areas of potential improvement are as follows:
 
-- *Communication between the two robots*. The strengths of Bluetooth are certainly not distance measurement by RSSI, but the reliable communication between modules. It would be straightforward for one hunting robot to inform the other whether it believes it is approaching the beacon or not. In the simplest case, a hunting robot that is approaching, or already at, the beacon can provide a second point of reference for a currently hunting robot.
-- *More complete usage of IMU*. A lot of development time was spent simply on getting the PIC to compass communication running, and not much time was spent on calibrating the sensor or processing the data. Given more time, we could continue to work towards dead reckoning of the mobile robots. This, paired with inter-swarm communication, would make for a much more sophisticated and likely much more efficient system. (Of course, this does not resolve the shallow gradients problem -- but it would allow the approach to the beacon to be much faster.)
+- *Communication between the two robots*. While Bluetooth may not offer good distance measurement via RSSI, it can be used for reliable communication between modules. It would be straightforward for one hunting robot to inform the other whether it believes it is approaching the beacon or not. In the simplest case, a hunting robot that is approaching, or already at, the beacon can provide a second point of reference for a currently hunting robot.
+- *More complete usage of IMU*. A lot of development time was spent simply on getting the PIC to compass communication running, and not much time was spent on calibrating the sensor or processing the data. In further stages of this project, we could continue to work towards dead reckoning of the mobile robots. This, paired with inter-swarm communication, would make for a much more sophisticated and likely much more efficient system. (Of course, this does not resolve the shallow gradients problem -- but it would allow the approach to the beacon to be much faster.)
 
 
 
@@ -464,4 +464,5 @@ Each file can also be found below:
 
 #### Other
 
-Website template: <https://github.com/tajmone/pandoc-goodies/tree/master/templates/html5/github>.
+* [ECE 4760 Website](http://people.ece.cornell.edu/land/courses/ece4760/) by Bruce Land 
+* Website template: <https://github.com/tajmone/pandoc-goodies/tree/master/templates/html5/github>.
