@@ -229,7 +229,7 @@ The fix to this was twofold:
 
 The updated versions of protothreads can be found in [Appendix B](#appendix-b).
 
-#### Gradient Descent
+#### Gradient descent
 
 The algorithm for deciding what path to follow is a basic version of gradient descent. The following image represents the decision-making fsm, where the starting state is **Measure rssi twice, take average**.
 
@@ -243,7 +243,7 @@ It did not prove much more accurate than randomized gradient descent, largely du
 
 ### Testing
 
-#### Bluetooth
+#### BLE
 
 Once we flashed the Bluetooth chips with the proper firmware, we used the [LightBlue](https://itunes.apple.com/us/app/lightblue-explorer/id557428110?mt=8) app to test communications.
 Using the app, we could discover the Bluetooth chips, and send and receive data.
@@ -259,12 +259,12 @@ We wrote code that parsed the chip output for the RSSI and saved the raw data. W
 - Compass I2C: This was more complex, and mostly involved testing the usage of the modes of both the MPU-9250 (IMU module) and the AK8963 (the compass itself). Performance testing was also important here, as the compass would not allow rapid reads in quick succession; we inserted nops in the `imu_mag_read_data(int * destination)` for this reason.
 - Compass calibration: We tested incrementally, first using hard-coded maximum and minimum observed values outputted from the IMU, and then with values taken from a self-calibration in which the robot would spin in a circle, and the PIC would record the largest and smallest values it saw on the X- and Y-axes.
 
+#### Servos
+We tested the functionality of servo code by testing individual functionality on both the hardware and software side. We tested the servo code in stages, first implementing control at a fixed speed and then implementing directional motion and lastly turning. This allowed us to verify our parts of the code and the functionality of the servos.
+
 #### Whole system
 - Some subsystem testing was required for the servo with the IMUs, for turning/driving straight with feedback. We debugged by reading in IMU values via UART and observing the robot's turns.
 - We tested extensively with the beacon and two hunters in different environments. Most of our initial testing was in a large, open space with a few metal tables on the periphery. We later tested in the lab in the Digital Lab (Phillips 238), and in the hallway where our demo took place. The confined space of the inside of the lab and hallway, as well as the presence of more reflective bodies (metal doors, tables, people) negatively impacted the performance of our hunters, and it was necessary to recalibrate the hunters to work better in the demo environment.
-
-#### Servos
-We tested the functionality of servo code by testing individual functionality on both the hardware and software side. We tested the servo code in stages, first implementing control at a fixed speed and then implementing directional motion and lastly turning. This allowed us to verify our parts of the code and the functionality of the servos.
 
 ## Results
 <!-- How fast was it? How accurate was it? What were the error ranges? -->
@@ -404,7 +404,7 @@ Each file can also be found below:
 *   [`wheel.stl`](stl/wheel.stl)
 *   [`drag.stl`](stl/drag.stl)
 
-#### RSSI Data
+#### RSSI data
 
 | Distance (feet) | RSSI A | RSSI B | RSSI C | RSSI Average | Expected RSSI |
 | --------------- | ------ | ------ | ------ | ------------ | ------------- |
@@ -458,7 +458,7 @@ Each file can also be found below:
 *   [HM-10 (Bluetooth breakout module & firmware)](http://www.jnhuamao.cn/bluetooth40_en.zip). The ZIP contains the original data sheet, as well as other documentation. [MIT has a PDF](http://fab.cba.mit.edu/classes/863.15/doc/tutorials/programming/bluetooth/bluetooth40_en.pdf) available, which may me out of date, but is easier to get to.
 *   [PIC32MX250](http://ww1.microchip.com/downloads/en/DeviceDoc/60001168J.pdf).
 
-#### Code and Designs borrowed from others
+#### Code and designs borrowed from others
 
 *   [Self-Balancing Robot](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/index.html) by Desmond Caulley (dc686@cornell.edu), Nadav Nehoran (nn233@cornell.edu), Sherry Zhao (hz263@cornell.edu). In particular, we borrowed extensively from their [i2c_helper.h](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/dc686_nn233_hz263/i2c_helper.h).
 
