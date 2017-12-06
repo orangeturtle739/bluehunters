@@ -367,9 +367,12 @@ A block diagram is not a schematic.
 |------------------------| ------------------------| ---------------|---------------------------|-----------------|---------|----------|
 | BLE 4.0 Module (TI CC2541)   | HM-10   | [Ebay](https://www.ebay.com/itm/AT-09-BLE-Bluetooth-4-0-Uart-Transceiver-Module-CC2541-Central-Switching-HM-10/142425748901?ssPageName=STRK%3AMEBIDX%3AIT&_trksid=p2057872.m2749.l2649)  | 142425748901  | 3 | $3.99  | $11.97  |
 | FEETECH FS90R  (pack of 2) Continuous Rotation Robotic Servo | FS90R  | [Amazon](https://www.amazon.com/gp/product/B074BFQC3Q/ref=oh_aui_detailpage_o06_s00?ie=UTF8&psc=1) | B074BFQC3Q  | 2  | $12.39  | $24.78  |
+| HiLetgo 9-Axis 9 DOF 16 Bit Gyroscope Acceleration Magnetic Sensor | MPU-9250  | [Amazon](https://www.amazon.com/HiLetgo-Gyroscope-Acceleration-Accelerator-Magnetometer/dp/B01I1J0Z7Y/ref=redir_mobile_desktop?_encoding=UTF8&dpID=51nl2fcMh6L&dpPl=1&keywords=mpu%209250&pi=AC_SX236_SY340_QL65&qid=1512564044&ref=plSrch&ref_=mp_s_a_1_3&sr=8-3)  | B01I1J0Z7Y | 2 | $8.49  | $16.98 |
 | Small board | -- | Lab rental | -- | 3 | $5.00 | $15.00 |
 | PIC32MX250F128B | PIC32MX250F128B | Lab rental | -- | 3 | $5.00 | $15.00 |
 | 6-inch Protoboard | -- | Lab rental | -- | 3 | $2.50 | $7.50 |
+
+**Total:** $91.23
 
 ### Appendix E: Work Distribution
 
