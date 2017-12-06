@@ -412,8 +412,8 @@ Each file can also be found below:
 | 8               | -68    | -66    | -72    | -68.67       | -75.09        |
 
 ### Appendix C: Schematics
-with schematics (you can download free software from expresspcb.com to draw schematics)
-A block diagram is not a schematic.
+
+![](schematic.png)
 
 ### Appendix D: Bill Of Materials
 
