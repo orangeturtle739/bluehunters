@@ -207,6 +207,10 @@ Additional helper methods used in I2C were defined in [`imu.c`](generated/imu.c.
 
 In order to calibrate the compass, the robots spun in place when powered on. They recorded the maximum and minimum values for each axes, and used that data to scale and center the magnetometer readings.
 
+#### Servos
+
+TODO JUSTIN WRITE ABOUT THE SERVOS
+
 #### Gradient Descent
 
 The algorithm for deciding what path to follow is a basic version of gradient descent. The following image represents the decision-making fsm, where the starting state is **Measure rssi twice, take average**.
