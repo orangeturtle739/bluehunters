@@ -251,6 +251,8 @@ By initially using a the iPhone app, which was known to work, we could debug the
 Once that worked, we had the chips communicate with each other.
 Finally, we had the chips take RSSI measurements.
 
+We wrote code that parsed the chip output for the RSSI and saved the raw data. We then plotted and tried to derive an RSSI distance correlation which proved to be unsuccessful. See the graph in the Results section. We were able to use this data however to derive the appropriate signal strength for our cutoff threshold. This also validated the effectiveness of RSSI as an approximate metric for distance measurement.
+
 
 #### IMU
 - Basic I2C: Basic testing was required to ensure I2C communication with the chip was working. This included testing the correctness of the I2C read and write functions (including the order of starts, restarts, and idles in accordance with the I2C protocol and the chip datasheets), as well basic parameters like the address of the MPU-9250 and its registers.
@@ -260,6 +262,9 @@ Finally, we had the chips take RSSI measurements.
 #### Whole system
 - Some subsystem testing was required for the servo with the IMUs, for turning/driving straight with feedback. We debugged by reading in IMU values via UART and observing the robot's turns.
 - We tested extensively with the beacon and two hunters in different environments. Most of our initial testing was in a large, open space with a few metal tables on the periphery. We later tested in the lab in the Digital Lab (Phillips 238), and in the hallway where our demo took place. The confined space of the inside of the lab and hallway, as well as the presence of more reflective bodies (metal doors, tables, people) negatively impacted the performance of our hunters, and it was necessary to recalibrate the hunters to work better in the demo environment.
+
+#### Servos
+We tested the functionality of servo code by testing individual functionality on both the hardware and software side. We tested the servo code in stages, first implementing control at a fixed speed and then implementing directional motion and lastly turning. This allowed us to verify our parts of the code and the functionality of the servos. 
 
 ## Results
 <!-- How fast was it? How accurate was it? What were the error ranges? -->
