@@ -42,8 +42,8 @@ Things you tried which did not work -->
 The robots are made from 4 3D printed pieces: 2 wheels, the frame, and the caster in the back.
 The servos, a 3 AA battery holder, and a perfboard containing all the circuitry are mounted directly to the frame.
 
-The robots where designed in [OpenSCAD](http://www.openscad.org/), and their source code is available in [our git repository](https://github.com/orangeturtle739/bluehunters/tree/master/cad).
-There are three files, `frame.scad`, `drag.scad`, and `wheel.scad`, for each of the three parts. The following renderings show each part:
+The robots where designed in [OpenSCAD](http://www.openscad.org/), and their source code is available in [our git repository](https://github.com/orangeturtle739/bluehunters/tree/master/cad) and [below](#appendix-b).
+There are three files, [`frame.scad`](generated/frame.scad.html), [`drag.scad`](generated/drag.scad.html), and [`wheel.scad`](generated/wheel.scad.html), for each of the three parts. The following renderings show each part:
 
 ![Robot chassis](frame.png){ width=50% }
 
@@ -113,18 +113,86 @@ They also provide [instructions on how to upgrade the firmware](http://www.jnhua
 
 ### Software
 
-The robots were programmed in C, using the [MPLAB X IDE](http://www.microchip.com/mplab/mplab-x-ide) v4.0, with the [XC32](http://www.microchip.com/mplab/compilers) v1.4 compiler and the [PIC 32 Legacy Peripheral Library (plib)](http://www.microchip.com/SWLibraryWeb/product.aspx?product=PIC32%20Peripheral%20Library). The full source code is available in [our git repository](https://github.com/orangeturtle739/bluehunters/tree/master/ble.X). The code is divided into 4 main units:
+The robots were programmed in C, using the [MPLAB X IDE](http://www.microchip.com/mplab/mplab-x-ide) v4.0, with the [XC32](http://www.microchip.com/mplab/compilers) v1.4 compiler and the [PIC 32 Legacy Peripheral Library (plib)](http://www.microchip.com/SWLibraryWeb/product.aspx?product=PIC32%20Peripheral%20Library). The full source code is available in [our git repository](https://github.com/orangeturtle739/bluehunters/tree/master/ble.X) and [below](#appendix-b). The code is divided into 5 main units:
 
-*   [`ble.c`](https://github.com/orangeturtle739/bluehunters/blob/master/ble.X/ble.c): contains all the functions for interacting with the BLE device over UART.
-*   [`imu.c`](https://github.com/orangeturtle739/bluehunters/blob/master/ble.X/imu.c): contains all the functions for interacting with the IMU (which contained the magnetometer) over I2C.
-*   [`servo.c`](https://github.com/orangeturtle739/bluehunters/blob/master/ble.X/servo.c): contains all the functions for interacting with the servos using PWM.
-*   [`pt_cornell_1_2_2.c`](https://github.com/orangeturtle739/bluehunters/blob/master/ble.X/pt_cornell_1_2_2.c): contains the functions which were originally declared in the protothreads header file.
+*   [`ble.c`](generated/ble.c.html): contains all the functions for interacting with the BLE device over UART.
+*   [`imu.c`](generated/imu.c.html): contains all the functions for interacting with the IMU (which contained the magnetometer) over I2C.
+*   [`servo.c`](generated/servo.c.html): contains all the functions for interacting with the servos using PWM.
+*   [`main.c`](generated/main.c.html): the main code.
+*   [`pt_cornell_1_2_2.c`](generated/pt_cornell_1_2_2.c.html): contains the functions which were originally declared in the protothreads header file.
     However, since they were in the header file, if multiple source files included the header file, there would be linking errors due to duplicate definitions of symbols.
-    Moving the protothreads functions to a separate file resolved this issue.
+    Moving the protothreads definitions to a separate file resolved this issue.
 
 #### BLE
 
-The BLE module used UART, at 9600 baud 8N1. We used `UART1` on the PIC for communicating with the BLE module, and used `UART2` for communicating with the computer.
+The BLE module used UART, at 9600 baud 8N1. We used `UART1` on the PIC for communicating with the BLE module, and used `UART2` for communicating with the computer (for debugging).
+The BLE files define a series of macros and `PT_THREAD` functions for printing characters and reading lines in a non-blocking fashion using protothreads.
+
+The [`main.c`](generated/main.c.html) file contains a thread which does all the communication with the Bluetooth chip using these functions. The commands it sends to the chip are:
+
+*   `AT+RESET`: resets the chip to ensure it is in a clean state before receiving other commands.
+*   `AT+IBEA1`: enables the iBeacon functionality of the chip (sets it to 1; `AT+IBEA0` would disable it by setting it to 0).
+    This allows the chip to be found with an RSSI scan.
+    After setting the value, we query it with `AT+IBEA?` and send the result over the other serial port to a computer for debugging.
+*   `AT+ROLE0` or `AT+ROLE1`: sets the role to either peripheral (0) or central (1).
+    The base station is set to peripheral, and the 2 robots are set to central.
+    Peripheral means the device will respond in inquiries from a central device.
+    This allows it to be discovered during an RSSI scan.
+    After setting the value, we query it with `AT+ROLE?` and send the result over the other serial port to a computer for debugging.
+*   `AT+IMME0` or `AT+IMME1`: sets the work state of the device to either actively listening for Bluetooth signals (0), or only acting when it receives a serial command (1).
+    Once again, the base station is set to 0: it needs to listen for signals and respond.
+    The robots are set to 1, as the chips need to initiate scan requests when they receive the command over serial.
+    After setting the value, we query it with `AT+IMME?` and send the result over the other serial port to a computer for debugging.
+*   `AT+NAME%s`: sets the name of the chip (which is visible when scanning) to `%s` (For example, `AT+NAMEPIRATE` names the chip `PIRATE`).
+    We give all the chips unique names to make debugging easier.
+    After setting the value, we query it with `AT+NAME?` and send the result over the other serial port to a computer for debugging.
+*   `AT+SHOW3`: configures the device to advertise both its name and RSSI when scanning.
+*   `AT+ADDR?`: queries the device for its hardware address. We recorded the hardware device of each chip, as when doing RSSI scans, the results are reported by hardware address.
+*   `AT+DISI?`: performed only on the robots, causing a discovery scan. The result of the scan is a bunch of lines of the form:
+    ```
+    OK+DISC:00000000:00000000000000000000000000000000:0000000000:6832A3801EBE:-080
+    ```
+    The second to last token, `6832A3801EBE`, is the hardware address of the discovered device, and the last token, `-080`, is the measured RSSI.
+    The chip will transmit a line for each device it finds ("line" is a misnomer as it does not separate them with any characters), followed by `OK+DISCE`.
+
+One interesting thing to note about the chip is that commands do not have to end with newlines or carriage returns. However, if sent, the chip will ignore them.
+
+#### IMU
+The PIC commmunicates with the IMU via I2C. The IMU  (sold by Adafruit) includes a breakout board for the QFN MPU-9250 module, which itself includes 2 dies. One contains the 3-axis gyroscope and 3-axis accelerometer, which were not used in this project, and the other die is the AK8963 3-axis magnetometer (compass).
+
+It is connected to the rest of the MPU module via an auxillary I2C bus, so it is not connected to the MPU's  main I2C bus by default. While the accelerometer and gyroscope registers can be read after powering up the IMU, the compass also needs pass-through mode to be enabled on the IMU to make it an accessible slave on the I2C bus. This is explained further in [I2C](#i2c).
+
+Some useful functions as defined in [`imu.h`](generated/imu.h.html) are described below:
+
+*   `void imu_init()`: Initializes the MPU-9250, including configuring the chip to allow reading the compass (for more, see [I2C](#i2c)).
+*   `int imu_get_heading()`  Returns the heading of the robot as a value between -180 and 180.
+    The compasses were not completely calibrated to find magnetic north; it only ensures angles are correct relevant to past headings.
+*   `void imu_mag_read_data(int * destination)` Fetches compass readings; saves register values into `destination` in the form `[x, y, z]`.
+*   `int angle_diff(int source, int target)` Gets the difference between two angles in degrees to account for discontinuity between -180 and 180 degrees.
+*   `int degree(int deg)`: Offsets degree values so that they fall within the range -180 to 180 degrees.
+
+Initializing the IMU involves opening the I2C module, and then configuring the IMU.
+
+1.  We open the `I2C2` module; `I2C1` uses pins already used by the connections to the Bluetooth module.
+    We open it with the baud rate generator value `BRG = (Fpb / 2 / baudrate) - 2 = 4e7 / 2 / 4e5 - 2 = 48`, as specified for `OpenI2C2()` in the [peripheral libraries](#references).
+2.  Pass through is enabled, interrupts for data ready are enabled, the IMU as an I2C master function is disabled, and the sensor is powered up.
+
+This enables the PIC to talk to the AK8963. The AK8963 has several modes of operation, and the chip must be set to power-down mode before switching to other modes. We read the IMU with single measurement mode, as specified below:
+
+![IMU single measurement mode](imu_single_measurement.png)
+
+1.  Set the compass to single measurement mode in 14 bit resolution.
+2.  Read the 6 data registers (X low, X high, Y low, Y high, Z low, Z high)
+3.  Read the Status 2 register to check for magnetic sensor overflow. Without reading this register, the read is not considered complete and further reads will fail.
+4.  Wait; if the IMU is read too frequently, it will not have enough time to take measurements.
+
+Additional helper methods used in I2C were defined in [`imu.c`](generated/imu.c.html). These are largely based on the files from the [self-balancing robot](#code-and-designs-borrowed-from-others).
+
+*   `char i2c_read_device(char device, char address)` Reads the data from a single register at `address`
+*   `void i2c_write_byte(char device, char address, char data)` All configurations used in this project involved writing single bytes of data.
+*   `void i2c_wait(int cnt)` Writes 2 nops; reads require time to return a value, and calling reads consecutively.
+
+In order to calibrate the compass, the robots spun in place when powered on. They recorded the maximum and minimum values for each axes, and used that data to scale and center the magnetometer readings.
 
 #### Gradient Descent
 
@@ -137,40 +205,6 @@ We also implemented and tested the following improved version that allows for co
 ![](turn_correction.png)
 
 It did not prove much more accurate than randomized gradient descent, largely due to noisy readings from IMU and Bluetooth signal strength.
-
-#### IMU
-The PIC commmunicates with the IMU via I2C. The IMU  (sold by Adafruit) includes a breakout board for the QFN MPU-9250 module, which itself includes 2 dies. One contains the 3-axis gyroscope and 3-axis accelerometer, which were not used in this project, and the other die is the AK8963 3-axis magnetometer (compass).
-
-It is connected to the rest of the MPU module via an auxillary I2C bus, so it is not connected to the MPU's  main I2C bus by default. While the accelerometer and gyroscope registers can be read after powering up the IMU, the compass also needs pass-through mode to be enabled on the IMU to make it an accessible slave on the I2C bus. This is explained further in [I2C](#i2c).
-
-Some useful functions as defined in [`imu.h`](generated/imu.h.html) are described below:
-
-* `void imu_init()`: Initializes the MPU-9250, including configuring the chip to allow reading the compass (for more, see [I2C](#i2c)).
-* `int imu_get_heading()`  Returns the heading of the robot as a value between -180 and 180. The compasses were not completely calibrated to find magnetic north; it only ensures angles are correct relevant to past headings.
-* `void imu_mag_read_data(int * destination)` Fetches compass readings; saves register values into `destination` in the form `[x, y, z]`.
-* `int angle_diff(int source, int target)` Gets the difference between two angles in degrees to account for discontinuity between -180 and 180 degrees.
-* `int degree(int deg)`: Offsets degree values so that they fall within the range -180 to 180 degrees.
-
-Initializing the IMU involves opening the I2C module, and then configuring the IMU.
-
-1. We open the `I2C2` module; `I2C1` uses pins already used by the connections to the Bluetooth module. We open it with the baud rate generator value `BRG = (Fpb / 2 / baudrate) - 2 = 4e7 / 2 / 4e5 - 2 = 48`, as specified for `OpenI2C2()` in the [peripheral libraries](#references).
-2. Pass through is enabled, interrupts for data ready are enabled, the IMU as an I2C master function is disabled, and the sensor is powered up.
-
-This enables the PIC to talk to the AK8963. The AK8963 has in several modes of operation, and the chip must be set to power-down mode before switching to other modes. We read the IMU with single measurement mode, as specified below:
-
-![IMU single measurement mode](imu_single_measurement.png)
-
-1. Set the compass to single measurement mode in 14 bit resolution.
-2. Read the 6 data registers (X low, X high, Y low, Y high, Z low, Z high)
-3. Read the Status 2 register to check for magnetic sensor overflow. Without reading this register, the read is not considered complete and further reads will fail.
-4. Wait; if the IMU is read too frequently, it will not have enough time to take measurements.
-
-Additional helper methods used in I2C were defined in [`imu.c`](generated/imu.c.html). These are largely based on the files from the [self-balancing robot](#code-and-designs-borrowed-from-others).
-
-* `char i2c_read_device(char device, char address)` Reads the data from a single register at `address`
-* `void i2c_write_byte(char device, char address, char data)` All configurations used in this project involved writing single bytes of data.
-* `void i2c_wait(int cnt)` Writes 2 nops; reads require time to return a value, and calling reads consecutively.
-
 
 ## Results
 <!-- How fast was it? How accurate was it? What were the error ranges? -->
@@ -228,20 +262,18 @@ Are there patent opportunites for your project?
 Are there publishing opportunities for your project?
 Ethical considerations. Refering to the IEEE Code of Ethics, specifically explain how decisions you made or actions you took in this project were consistent with this Code of Ethics. I expect at least 200 words on this topic. A bulleted list will not be acceptable. -->
 
-This assignment was an interesting exploration into short-range distance determination using Bluetooth, a generally unconventional approach. We were warned beforehand about the difficulties in using Bluetooth RSSI, a measurement particularly susceptible to multipath interference, as a distance sensor -- both in the papers and reference materials researched before implementation, as well as by course staff in the early stages of our project. We worked with the course staff to simplify and stratify our project into workable milestones. Our final demo represents a midpoint of our original plan. 
+This assignment was an interesting exploration into short-range distance determination using Bluetooth, a generally unconventional approach. We were warned beforehand about the difficulties in using Bluetooth RSSI, a measurement particularly susceptible to multipath interference, as a distance sensor -- both in the papers and reference materials researched before implementation, as well as by course staff in the early stages of our project. We worked with the course staff to simplify and stratify our project into workable milestones. Our final project is a reduced version of our original plan.
 
-Our hunting bots had reliable performance when they stayed within 1 m of the beacon. After this rough threshold, the signal strength from the beacon (already noisy) would only make a shallow gradient that the hunting bot could not consistently follow. Our bots also worked better in larger, more open spaces, preferably without metal structures like tables or doors nearby. Both of these are reasonable given the operating range of BLE 4.0. 
+Our hunting bots worked reliably when they stayed within roughly 1 m of the beacon. After this, they entered the land of shallow gradients: the signal strength from the beacon (already noisy) would not change very much, and often only due to noise. The hunting bots normally could never recover from this. Our bots also worked better in larger, more open spaces, preferably without metal structures like tables or doors nearby. Both of these are reasonable given the operating range of BLE 4.0.
 
-We reused some of the code from the [Self-Balancing Robot](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/index.html) as [cited](#code-and-designs-borrowed-from-others) in  our references section, and explained in [IMU](#imu). The rest of the design is ours, and is not an infringement on intellectual property.
+We reused some of the code from the [Self-Balancing Robot](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/index.html) as [cited](#code-and-designs-borrowed-from-others) in  our references section, and explained in [IMU](#imu). The rest of the design is ours, and is not an infringement on intellectual property. We also used the Bluetooth firmware flashing technique we discovered on the [Arduino forums](http://forum.arduino.cc/index.php?topic=393655.msg2709528#msg2709528).
 
-TODO: maybe mention the firmware flashing stuff?
+We did not reverse-engineer any technology, and did not encounter any issues with trademarks or patents. We did not have to sign non-disclosure to get a sample part. We hope to further polish our findings and report, and will aim to publish them in a print magazine, ideally as a part of ECE 4920.
 
-We did not reverse-engineer any technology, and did not encounter any issues with trademarks or patents. We did not have to sign non-disclosure to get a sample part. We don't wish to patent this project. We hope to further polish our findings and report, and will aim to publish them in a print magazine, ideally as a part of ECE 4920.
+There are many potential avenues for improvements or further development. In addition to more circumstantial difficulties encountered during the project work period (such as extremely uneven servos), two areas of potential improvement are as follows:
 
-There are many potential avenues for improvements or further development. In addition to more circumstantial difficulties encountered during the project work period (such as extremely uneven servos), two areas of potential improvmeent are as follows:
-
-- *Communication between the two robots*. The strengths of Bluetooth are certainly not distance measurement by RSSI, but the reliable communication between modules. It would be straightforward for one hunting robot to inform the other whether it believes it is approaching the beacon or not. In the simplest case, a hunting robot that is approaching, or already at, the beacon can provide a second point of reference for a currently hunting robot. 
-- *More complete usage of IMU*. A lot of development time was spent simply on getting the PIC to compass communication running, and not much time was spent on calibrating the sensor or processing the data. Given more time, we could continue to work towards dead reckoning of the mobile robots. This, paired with inter-swarm communication, would make for a much more sophisticated and likely much more efficient system. (Of course, this does not resolve the shallow gradients problem -- but it would allow the approach to the beacon to be much faster.) 
+- *Communication between the two robots*. The strengths of Bluetooth are certainly not distance measurement by RSSI, but the reliable communication between modules. It would be straightforward for one hunting robot to inform the other whether it believes it is approaching the beacon or not. In the simplest case, a hunting robot that is approaching, or already at, the beacon can provide a second point of reference for a currently hunting robot.
+- *More complete usage of IMU*. A lot of development time was spent simply on getting the PIC to compass communication running, and not much time was spent on calibrating the sensor or processing the data. Given more time, we could continue to work towards dead reckoning of the mobile robots. This, paired with inter-swarm communication, would make for a much more sophisticated and likely much more efficient system. (Of course, this does not resolve the shallow gradients problem -- but it would allow the approach to the beacon to be much faster.)
 
 
 
@@ -249,9 +281,9 @@ There are many potential avenues for improvements or further development. In add
 
 Our project, as well as the design and creation project thereof,  adheres to the [IEEE Code of Ethics](https://www.ieee.org/about/ethics.html). The project itself is relatively small and physically self-contained; it did not have any immediate impact on the environment or safety and health of potential users, we the creators, or any others. We chose the project's topic out of interest and for a challenge, without any conflict of interest. Our report is honest and realistic; none of our data is fabricated, and our conclusions reflect our hard findings. We did not accept any form of bribery.
 
-The project investigated the use of an emerging and popular technology (BLE) in a new application (distance sensing). We challenged ourselves while not attempting tasks we were not qualified to do. We consistently received and built upon advice from our TAs and professor Bruce Land, and cite the work we used in the basis of our project. 
+The project investigated the use of an emerging and popular technology (BLE) in a new application (distance sensing). We challenged ourselves while not attempting tasks we were not qualified to do. We consistently received and built upon advice from our TAs and professor Bruce Land, and cite the work we used in the basis of our project.
 
-Additionally, neither we nor our project presented any act of discrimination, and our project does not injure others in any way. We assisted our colleagues (both fellow group members and other classmates) when the occasion arose, such as by offering help debugging or lending a spare module before a demo. 
+Additionally, neither we nor our project presented any act of discrimination, and our project does not injure others in any way. We assisted our colleagues (both fellow group members and other classmates) when the occasion arose, such as by offering help debugging or lending a spare module before a demo.
 
 Overall, our project complies with the IEEE Policies, 7.8 Code of Ethics.
 <!-- in conclusion, we aren't jerks -->
@@ -273,7 +305,7 @@ Background sites/paper -->
 
 *   The group approves this report for inclusion on the course website.
 *   The group approves the video for inclusion on the course youtube channel.
-*   The TI CC2541 meets FCC CFR47 the Part 15 requirements. [^tidatasheet]
+*   The TI CC2541 meets FCC CFR47 Part 15 requirements. [^tidatasheet]
 
 [^tidatasheet]: See the top of page 8 of <http://www.ti.com/lit/ds/symlink/cc2541.pdf> for compliance information.
 
@@ -281,6 +313,8 @@ Background sites/paper -->
 ### Appendix B: Source Listing
 Our source code can be found [on Github](https://github.com/orangeturtle739/bluehunters).
 Each file can also be found below:
+
+#### Code
 
 *   [`ble.c`](generated/ble.c.html)
 *   [`ble.h`](generated/ble.h.html)
@@ -294,8 +328,23 @@ Each file can also be found below:
 *   [`main.h`](generated/main.h.html)
 *   [`config_1_2_2.h`](generated/config_1_2_2.h.html)
 
+#### CAD
 
-### RSSI Data
+##### Sources
+
+*   [`main.scad`](generated/main.scad.html)
+*   [`frame.scad`](generated/frame.scad.html)
+*   [`wheel.scad`](generated/wheel.scad.html)
+*   [`drag.scad`](generated/drag.scad.html)
+*   [`concept.scad`](generated/concept.scad.html)
+
+##### STL
+
+*   [`frame.stl`](stl/frame.stl)
+*   [`wheel.stl`](stl/wheel.stl)
+*   [`drag.stl`](stl/drag.stl)
+
+#### RSSI Data
 
 | Distance (feet) | RSSI A | RSSI B | RSSI C | RSSI Average | Expected RSSI |
 | --------------- | ------ | ------ | ------ | ------------ | ------------- |
@@ -351,4 +400,4 @@ A block diagram is not a schematic.
 
 #### Other
 
-Website template: <https://github.com/tajmone/pandoc-goodies/tree/master/templates/html5/github>
+Website template: <https://github.com/tajmone/pandoc-goodies/tree/master/templates/html5/github>.
