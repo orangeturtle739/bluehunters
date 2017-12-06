@@ -11,10 +11,11 @@ date: December 6, 2017
 
 ## Introduction
 We built 2 small cars which used Bluetooth Received Signal Strength Indicator (RSSI) measurements to navigate towards a stationary base station.
-The cars and base station used a Bluetooth Low Energy (BLE) 4.0 module to take the measurements and a PIC32MX250 microcontroller. The cars also used a 3 axis magnetometer as as compass in order to reliably turn, as well as 2 micro 9 g servos to drive them.
+The cars and base station used a Bluetooth Low Energy (BLE) 4.0 module to take the measurements and a PIC32MX250 microcontroller. The cars also used a 3 axis magnetometer as as compass in order to reliably turn, as well as 2 micro 9 g servos to drive.
 Each unit was powered with 3 AA batteries.
 Finally, the chassis and wheels of each car were 3D printed.
 
+### Video
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/g5H4cLJBA_Q?rel=0" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
 
@@ -43,7 +44,7 @@ The robots are made from 4 3D printed pieces: 2 wheels, the frame, and the caste
 The servos, a 3 AA battery holder, and a perfboard containing all the circuitry are mounted directly to the frame.
 
 The robots where designed in [OpenSCAD](http://www.openscad.org/), and their source code is available in [our git repository](https://github.com/orangeturtle739/bluehunters/tree/master/cad) and [below](#appendix-b).
-There are three files, [`frame.scad`](generated/frame.scad.html), [`drag.scad`](generated/drag.scad.html), and [`wheel.scad`](generated/wheel.scad.html), for each of the three parts. The following renderings show each part:
+There are three files, [`frame.scad`](generated/frame.scad.html), [`drag.scad`](generated/drag.scad.html), and [`wheel.scad`](generated/wheel.scad.html), for each of the three parts. The main modules are defined in [`main.scad`](generated/main.scad.html), and the other files just instantiate them. The following renderings show each part:
 
 ![Robot chassis](frame.png){ width=50% }
 
@@ -73,13 +74,13 @@ Multiple views of the robots:
 #### Bluetooth modules
 
 The HM-10 bluetooth modules we bought off Ebay were fakes: they were not made by Jnhuamao [^china], and did not come with genuine Jnhuamao firmware.
-Initially, we tried to use these chips, but quickly discovered that they did not behave according to the Jnhuamao data sheet (see [the data sheets section](#data-sheets)).
-As the hardware on the fake chips is the same as that of the genuine chips, minus an external crystal.
-However, the genuine firmware checks for the presence of the crystal, and works even without it. [^arduinoforums]
+However, they did have a real TI CC2541 chip.
+We realized they were fakes when they did not behave according to the Jnhuamao data sheet (see [the data sheets section](#data-sheets)).
+Luckily the hardware on the fake chips is the same as that of the genuine chips, minus an external crystal, and the genuine firmware checks for the presence of the crystal, and works even without it. [^arduinoforums]
 As such, we reprogrammed the chips with the genuine firmware according to an [Arduino forum post](http://forum.arduino.cc/index.php?topic=393655.msg2709528#msg2709528):
 
 1.  We soldered wires to the programming pins on the breakout boards, and connected those pins to an [Arduino Teensy 3.2](https://www.pjrc.com/teensy/teensy31.html).
-    We chose a Teensy because it is 3.3 V as opposed to 5, which would damage the CC2541.
+    We chose a Teensy because it is 3.3 V as opposed to 5, which would damage the 3.3 V CC2541.
 
     The pins were connected as follows:
 
@@ -210,6 +211,22 @@ In order to calibrate the compass, the robots spun in place when powered on. The
 #### Servos
 
 TODO JUSTIN WRITE ABOUT THE SERVOS
+
+#### Protothreads
+
+While the provided protothreads library was very helpful, it did not work correctly when used in multiple compilation units.
+The reason for this was that it defined variables and functions in the header file, so if multiple source files included [`pt_cornell_1_2_2.h`](generated/pt_cornell_1_2_2.h.html), linking would fail with duplicate symbol definitions.
+Furthermore, if multiple files included [`config_1_2_2.h`](generated/config_1_2_2.h.html), linking would fail with the obscure error:
+```
+section `.config_BFC00BF4' will not fit in region `config2'
+```
+This happened because if multiple compilation units included `#pragma config` directives (which they did by including a `#include "config_1_2_2.h"` directive), then the linker would try to assign too many symbols to the configuration region.
+
+The fix to this was twofold:
+1.  We modified protothreads to have both a header and source file, with definitions only in the source file.
+1.  We only included [`config_1_2_2.h`](generated/config_1_2_2.h.html) in the main C file, and moved all macro definitions to the protothreads header.
+
+The updated versions of protothreads can be found in [Appendix B](#appendix-b).
 
 #### Gradient Descent
 
