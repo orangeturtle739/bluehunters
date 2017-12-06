@@ -130,11 +130,11 @@ The BLE module used UART, at 9600 baud 8N1. We used `UART1` on the PIC for commu
 
 The algorithm for deciding what path to follow is a basic version of gradient descent. The following image represents the decision-making fsm, where the starting state is **Measure rssi twice, take average**.
 
-![Gradient descent fsm](grad_desc.png)
+![](grad_desc.png)
 
 We also implemented and tested the following improved version that allows for correction; a car that has just moved forward and detected a weakened signal does not know whether the beacon to its left or right. If after turning, the signal is still weaker, it has picked the wrong turn. This decision process corrects this:
 
-![Turn-corrected grdaient dsecent](turn_correction.png)
+![](turn_correction.png)
 
 It did not prove much more accurate than randomized gradient descent, largely due to noisy readings from IMU and Bluetooth signal strength.
 
@@ -165,9 +165,11 @@ This enables the PIC to talk to the AK8963. The AK8963 has in several modes of o
 3. Read the Status 2 register to check for magnetic sensor overflow. Without reading this register, the read is not considered complete and further reads will fail.
 4. Wait; if the IMU is read too frequently, it will not have enough time to take measurements.
 
-Additional helper methods used in I2C were defined in [`imu.c`](generated/imu.c.html):`dress)` Reads the data from a single register at `address`
-* `i2c_write_byte(char device, char address, char data)` All configurations used in this project involved writing single bytes of data.
-* `i2c_wait(int cnt)` Writes 2 nops; reads require time to return a value, and calling reads consecutively.
+Additional helper methods used in I2C were defined in [`imu.c`](generated/imu.c.html). These are largely based on the files from the [self-balancing robot](#code-and-designs-borrowed-from-others).
+
+* `char i2c_read_device(char device, char address)` Reads the data from a single register at `address`
+* `void i2c_write_byte(char device, char address, char data)` All configurations used in this project involved writing single bytes of data.
+* `void i2c_wait(int cnt)` Writes 2 nops; reads require time to return a value, and calling reads consecutively.
 
 
 ## Results
@@ -225,6 +227,34 @@ Did you have to sign non-disclosure to get a sample part?
 Are there patent opportunites for your project?
 Are there publishing opportunities for your project?
 Ethical considerations. Refering to the IEEE Code of Ethics, specifically explain how decisions you made or actions you took in this project were consistent with this Code of Ethics. I expect at least 200 words on this topic. A bulleted list will not be acceptable. -->
+
+This assignment was an interesting exploration into short-range distance determination using Bluetooth, a generally unconventional approach. We were warned beforehand about the difficulties in using Bluetooth RSSI, a measurement particularly susceptible to multipath interference, as a distance sensor -- both in the papers and reference materials researched before implementation, as well as by course staff in the early stages of our project. We worked with the course staff to simplify and stratify our project into workable milestones. Our final demo represents a midpoint of our original plan. 
+
+Our hunting bots had reliable performance when they stayed within 1 m of the beacon. After this rough threshold, the signal strength from the beacon (already noisy) would only make a shallow gradient that the hunting bot could not consistently follow. Our bots also worked better in larger, more open spaces, preferably without metal structures like tables or doors nearby. Both of these are reasonable given the operating range of BLE 4.0. 
+
+We reused some of the code from the [Self-Balancing Robot](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/index.html) as [cited](#code-and-designs-borrowed-from-others) in  our references section, and explained in [IMU](#imu). The rest of the design is ours, and is not an infringement on intellectual property.
+
+TODO: maybe mention the firmware flashing stuff?
+
+We did not reverse-engineer any technology, and did not encounter any issues with trademarks or patents. We did not have to sign non-disclosure to get a sample part. We don't wish to patent this project. We hope to further polish our findings and report, and will aim to publish them in a print magazine, ideally as a part of ECE 4920.
+
+There are many potential avenues for improvements or further development. In addition to more circumstantial difficulties encountered during the project work period (such as extremely uneven servos), two areas of potential improvmeent are as follows:
+
+- *Communication between the two robots*. The strengths of Bluetooth are certainly not distance measurement by RSSI, but the reliable communication between modules. It would be straightforward for one hunting robot to inform the other whether it believes it is approaching the beacon or not. In the simplest case, a hunting robot that is approaching, or already at, the beacon can provide a second point of reference for a currently hunting robot. 
+- *More complete usage of IMU*. A lot of development time was spent simply on getting the PIC to compass communication running, and not much time was spent on calibrating the sensor or processing the data. Given more time, we could continue to work towards dead reckoning of the mobile robots. This, paired with inter-swarm communication, would make for a much more sophisticated and likely much more efficient system. (Of course, this does not resolve the shallow gradients problem -- but it would allow the approach to the beacon to be much faster.) 
+
+
+
+### IEEE Code of Ethics
+
+Our project, as well as the design and creation project thereof,  adheres to the [IEEE Code of Ethics](https://www.ieee.org/about/ethics.html). The project itself is relatively small and physically self-contained; it did not have any immediate impact on the environment or safety and health of potential users, we the creators, or any others. We chose the project's topic out of interest and for a challenge, without any conflict of interest. Our report is honest and realistic; none of our data is fabricated, and our conclusions reflect our hard findings. We did not accept any form of bribery.
+
+The project investigated the use of an emerging and popular technology (BLE) in a new application (distance sensing). We challenged ourselves while not attempting tasks we were not qualified to do. We consistently received and built upon advice from our TAs and professor Bruce Land, and cite the work we used in the basis of our project. 
+
+Additionally, neither we nor our project presented any act of discrimination, and our project does not injure others in any way. We assisted our colleagues (both fellow group members and other classmates) when the occasion arose, such as by offering help debugging or lending a spare module before a demo. 
+
+Overall, our project complies with the IEEE Policies, 7.8 Code of Ethics.
+<!-- in conclusion, we aren't jerks -->
 
 ## Appendices
 
@@ -315,7 +345,7 @@ A block diagram is not a schematic.
 *   [HM-10 (Bluetooth breakout module & firmware)](http://www.jnhuamao.cn/bluetooth40_en.zip). The ZIP contains the original data sheet, as well as other documentation. [MIT has a PDF](http://fab.cba.mit.edu/classes/863.15/doc/tutorials/programming/bluetooth/bluetooth40_en.pdf) available, which may me out of date, but is easier to get to.
 *   [PIC32MX250](http://ww1.microchip.com/downloads/en/DeviceDoc/60001168J.pdf).
 
-#### Code/designs borrowed from others
+#### Code and Designs borrowed from others
 
 *   [Self-Balancing Robot](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/index.html) by Desmond Caulley (dc686@cornell.edu), Nadav Nehoran (nn233@cornell.edu), Sherry Zhao (hz263@cornell.edu). In particular, we borrowed extensively from their [i2c_helper.h](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/dc686_nn233_hz263/i2c_helper.h).
 
