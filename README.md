@@ -44,7 +44,7 @@ Things you tried which did not work -->
 The robots are made from 4 3D printed pieces: 2 wheels, the frame, and the caster in the back.
 The servos, a 3 AA battery holder, and a perfboard containing all the circuitry are mounted directly to the frame.
 
-The robots where designed in [OpenSCAD](http://www.openscad.org/), and their source code is available in [our git repository](https://github.com/orangeturtle739/bluehunters/tree/master/cad) and [below](#appendix-b).
+The robots where designed in [OpenSCAD](http://www.openscad.org/), and their source code is available in [our git repository](https://github.com/orangeturtle739/bluehunters/tree/master/cad) and [below](#appendix-b-source-listing).
 There are three files, [`frame.scad`](generated/frame.scad.html), [`drag.scad`](generated/drag.scad.html), and [`wheel.scad`](generated/wheel.scad.html), for each of the three parts. The main modules are defined in [`main.scad`](generated/main.scad.html), and the other files just instantiate them. The following renderings show each part:
 
 ![Robot chassis](frame.png){ width=50% }
@@ -75,9 +75,9 @@ Multiple views of the robots:
 #### Bluetooth modules
 
 The HM-10 bluetooth modules we bought off Ebay were fakes: they were not made by Jnhuamao [^china], and did not come with genuine Jnhuamao firmware.
-However, they did have a real TI CC2541 chip.
+However, they did have real TI CC2541 chips.
 We realized they were fakes when they did not behave according to the Jnhuamao data sheet (see [the data sheets section](#data-sheets)).
-Luckily the hardware on the fake chips is the same as that of the genuine chips, minus an external crystal, and the genuine firmware checks for the presence of the crystal, and works even without it. [^arduinoforums]
+Luckily, the hardware on the fake chips is the same as that of the genuine chips, minus an external crystal, and the genuine firmware checks for the presence of the crystal, and works even without it. [^arduinoforums]
 As such, we reprogrammed the chips with the genuine firmware according to an [Arduino forum post](http://forum.arduino.cc/index.php?topic=393655.msg2709528#msg2709528):
 
 1.  We soldered wires to the programming pins on the breakout boards, and connected those pins to an [Arduino Teensy 3.2](https://www.pjrc.com/teensy/teensy31.html).
@@ -128,7 +128,7 @@ They also provide [instructions on how to upgrade the firmware](http://www.jnhua
 
 ### Software
 
-The robots were programmed in C, using the [MPLAB X IDE](http://www.microchip.com/mplab/mplab-x-ide) v4.0, with the [XC32](http://www.microchip.com/mplab/compilers) v1.4 compiler and the [PIC 32 Legacy Peripheral Library (plib)](http://www.microchip.com/SWLibraryWeb/product.aspx?product=PIC32%20Peripheral%20Library). The full source code is available in [our git repository](https://github.com/orangeturtle739/bluehunters/tree/master/ble.X) and [below](#appendix-b). The code is divided into 5 main units:
+The robots were programmed in C, using the [MPLAB X IDE](http://www.microchip.com/mplab/mplab-x-ide) v4.0, with the [XC32](http://www.microchip.com/mplab/compilers) v1.4 compiler and the [PIC 32 Legacy Peripheral Library (plib)](http://www.microchip.com/SWLibraryWeb/product.aspx?product=PIC32%20Peripheral%20Library). The full source code is available in [our git repository](https://github.com/orangeturtle739/bluehunters/tree/master/ble.X) and [below](#appendix-b-source-listing). The code is divided into 5 main units:
 
 *   [`ble.c`](generated/ble.c.html): contains all the functions for interacting with the BLE device over UART.
 *   [`imu.c`](generated/imu.c.html): contains all the functions for interacting with the IMU (which contained the magnetometer) over I2C.
@@ -224,10 +224,11 @@ section `.config_BFC00BF4' will not fit in region `config2'
 This happened because if multiple compilation units included `#pragma config` directives (which they did by including a `#include "config_1_2_2.h"` directive), then the linker would try to assign too many symbols to the configuration region.
 
 The fix to this was twofold:
+
 1.  We modified protothreads to have both a header and source file, with definitions only in the source file.
 1.  We only included [`config_1_2_2.h`](generated/config_1_2_2.h.html) in the main C file, and moved all macro definitions to the protothreads header.
 
-The updated versions of protothreads can be found in [Appendix B](#appendix-b).
+The updated versions of protothreads can be found in [Appendix B](#appendix-b-source-listing).
 
 #### Gradient descent
 
@@ -239,7 +240,7 @@ We also implemented and tested the following improved version that allows for co
 
 ![](turn_correction.png)
 
-It did not prove much more accurate than randomized gradient descent, largely due to noisy readings from IMU and Bluetooth signal strength.
+It did not prove much more accurate than randomized gradient descent, largely due to noisy readings from IMU and Bluetooth signal strength. As such, we used the simplified version.
 
 ### Testing
 
@@ -251,7 +252,7 @@ By initially using a the iPhone app, which was known to work, we could debug the
 Once that worked, we had the chips communicate with each other.
 Finally, we had the chips take RSSI measurements.
 
-We wrote code that parsed the chip output for the RSSI and saved the raw data. We then plotted and tried to derive an RSSI distance correlation which proved to be unsuccessful. See the graph in the Results section. We were able to use this data however to derive the appropriate signal strength for our cutoff threshold. This also validated the effectiveness of RSSI as an approximate metric for distance measurement.
+We also experimented with RSSI, as described in [results](#results). This data validated the effectiveness of RSSI as an approximate metric for distance measurement, though confirmed that it would be highly variable.
 
 
 #### IMU
@@ -285,7 +286,7 @@ In most cases, at least 1 of the 2 robots successfully making it to the base sta
 
 We expected that RSSI would vary with distance according to the following relation:
 
-$$\text{RSSI} = A - 10 n \log(d)$$
+$\text{RSSI} = A - 10 n \log(d)$
 
 where $A$ and $n$ are RF propagation parameters in dBm, $d$ is distance in meters, and RSSI is the measured RSSI in dBm. [^signalstrength]
 We experimented with RSSI measurements to determine how well they worked by taking 2 Bluetooth modules, and measuring the RSSI while changing the distance between them.

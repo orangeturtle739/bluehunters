@@ -30,7 +30,7 @@ for f in cad/*.scad; do
   echo "title: $(basename $f)" >> $TARGET_MD
   echo "---" >> $TARGET_MD
   echo >> $TARGET_MD
-  echo '```scad' >> $TARGET_MD
+  echo '```txt' >> $TARGET_MD
   cat $f >> $TARGET_MD
   echo >> $TARGET_MD
   echo '```' >> $TARGET_MD
