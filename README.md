@@ -141,7 +141,7 @@ The robots were programmed in C, using the [MPLAB X IDE](http://www.microchip.co
 #### BLE
 
 The BLE module used UART, at 9600 baud 8N1. We used `UART1` on the PIC for communicating with the BLE module, and used `UART2` for communicating with the computer (for debugging).
-The BLE files define a series of macros and `PT_THREAD` functions for printing characters and reading lines in a non-blocking fashion using protothreads.
+The BLE files define a series of macros and `PT_THREAD` functions for printing characters and reading lines in a non-blocking fashion using protothreads. All of the `PT_THREAD` functions can be spawned with `PT_SPAWN` to run them.
 
 The [`main.c`](generated/main.c.html) file contains a thread which does all the communication with the Bluetooth chip using these functions. The commands it sends to the chip are:
 
