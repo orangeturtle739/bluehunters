@@ -2,7 +2,7 @@ SHELL := /bin/bash
 TEMPLATE = "https://raw.githubusercontent.com/tajmone/pandoc-goodies/2e29e9cd54bb9113c0b4fb474a07b8fcf6ee287b/templates/html5/github/GitHub.html5"
 .PHONY: clean
 
-report/report.html: README.md report/GitHub.html5 renderings/frame.png renderings/drag.png renderings/wheel.png report/generated | report
+report/report.html: README.md report/GitHub.html5 renderings/frame.png renderings/drag.png renderings/wheel.png report/generated report/stl | report
 	pandoc README.md --template report/GitHub.html5 --resource-path=assets:renderings --self-contained --toc --toc-depth 3 -r markdown+yaml_metadata_block+footnotes+pipe_tables -t html -s -o report/report.html
 report/GitHub.html5: | report
 	rm -f report/GitHub.html5 && wget $(TEMPLATE) -O report/GitHub.html5
@@ -17,8 +17,11 @@ renderings/drag.png: cad/drag.scad cad/main.scad | renderings
 	openscad --render --imgsize 1600,1200 -o renderings/drag.png cad/drag.scad
 renderings/wheel.png: cad/wheel.scad cad/main.scad | renderings
 	openscad --render --imgsize 1600,1200 --camera 0,0,0,40,0,25,240 -o renderings/wheel.png cad/wheel.scad
-report/generated: report/GitHub.html5 ble.X/$(wildcard *.c) ble.X/$(wildcard *.h)
+report/generated: report/GitHub.html5 ble.X/$(wildcard *.c) ble.X/$(wildcard *.h) cad/$(wildcard *.scad) generate_source_pages.sh
 	./generate_source_pages.sh
+report/stl: cad/$(wildcard *.stl)
+	mkdir -p report/stl
+	cp cad/*.stl report/stl
 report:
 	mkdir -p $@
 renderings:
