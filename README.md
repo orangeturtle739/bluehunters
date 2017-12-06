@@ -157,7 +157,9 @@ While the chip reported RSSI in units proportional to dBm, and we measured dista
 The constants $A$ and $n$, provided we determined them empirically based on the data, would encode the conversions.
 As such, we fit the data using the above formula with $A=-48$ and $n=3$, resulting in the blue curve above.
 While the general shape of the curve matches, there is significant noise in the averaged RSSI data.
-Furthermore, when we tried to reproduce the measurements, we could not do so accurately -- it seemed to even depend on where our feet where!
+Furthermore, when we tried to reproduce the measurements, we could not do so accurately -- it seemed to even depend on where our feet where! See [Appendix B](#rssi-data) for the source data for the table.
+
+Despite how noisy the RSSI measurements where, the robots were still able to perform a reasonably accurate gradient descent. In most cases, at least one of the 2 robots would find the beacon in a matter of minutes.
 
 [^signalstrength]: L. Peneda, A. Azenha and A. Carvalho, "Trilateration for indoors positioning within the framework of wireless communications," 2009 35th Annual Conference of IEEE Industrial Electronics, Porto, 2009, pp. 2732-2737.
 
@@ -222,6 +224,19 @@ Each file can also be found below:
 *   [`main.h`](generated/main.h.html)
 *   [`config_1_2_2.h`](generated/config_1_2_2.h.html)
 
+
+### RSSI Data
+
+| Distance (feet) | RSSI A | RSSI B | RSSI C | RSSI Average | Expected RSSI |
+| --------------- | ------ | ------ | ------ | ------------ | ------------- |
+| 1               | -48    | -48    | -48    | -48.00       | -48.00        |
+| 2               | -56    | -58    | -52    | -55.33       | -57.03        |
+| 3               | -66    | -66    | -68    | -66.67       | -62.31        |
+| 4               | -64    | -68    | -65    | -65.67       | -66.06        |
+| 5               | -60    | -70    | -64    | -64.67       | -68.97        |
+| 6               | -80    | -80    | -76    | -78.67       | -71.34        |
+| 7               | -80    | -79    | -65    | -74.67       | -73.35        |
+| 8               | -68    | -66    | -72    | -68.67       | -75.09        |
 
 ### Appendix C: Schematics
 with schematics (you can download free software from expresspcb.com to draw schematics)
