@@ -175,11 +175,11 @@ One interesting thing to note about the chip is that commands do not have to end
 #### IMU
 The PIC commmunicates with the IMU via I2C. The IMU includes a breakout board for the QFN MPU-9250 module, which itself includes 2 dies. One contains the 3-axis gyroscope and 3-axis accelerometer, which were not used in this project, and the other die is the AK8963 3-axis magnetometer (compass).
 
-It is connected to the rest of the MPU module via an auxillary I2C bus, so it is not connected to the MPU's  main I2C bus by default. While the accelerometer and gyroscope registers can be read after powering up the IMU, the compass also needs pass-through mode to be enabled on the IMU to make it an accessible slave on the I2C bus. This is explained further in [I2C](#i2c).
+It is connected to the rest of the MPU module via an auxillary I2C bus, so it is not connected to the MPU's  main I2C bus by default. While the accelerometer and gyroscope registers can be read after powering up the IMU, the compass also needs pass-through mode to be enabled on the IMU to make it an accessible slave on the I2C bus.
 
 Some useful functions as defined in [`imu.h`](generated/imu.h.html) are described below:
 
-*   `void imu_init()`: Initializes the MPU-9250, including configuring the chip to allow reading the compass (for more, see [I2C](#i2c)).
+*   `void imu_init()`: Initializes the MPU-9250, including configuring the chip to allow reading the compass.
 *   `int imu_get_heading()`  Returns the heading of the robot as a value between -180 and 180.
     The compasses were not completely calibrated to find magnetic north; it only ensures angles are correct relevant to past headings.
 *   `void imu_mag_read_data(int * destination)` Fetches compass readings; saves register values into `destination` in the form `[x, y, z]`.
