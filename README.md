@@ -211,23 +211,6 @@ In order to calibrate the compass, the robots spun in place when powered on. The
 
 TODO JUSTIN WRITE ABOUT THE SERVOS
 
-### Testing
-
-Throughout the design process, we kept unit testing in mind and tested continually during development. Testing can roughly be split between unit testing of the different components of the project and holistic testing of the system.
-
-Bluetooth
--
-
-
-IMU
-- Basic I2C: Basic testing was required to ensure I2C communication with the chip was working. This included testing the correctness of the I2C read and write functions (including the order of starts, restarts, and idles in accordance with the I2C protocol and the chip datasheets), as well basic parameters like the address of the MPU-9250 and its registers.
-- Compass I2C: This was more complex, and mostly involved testing the usage of the modes of both the MPU-9250 (IMU module) and the AK8963 (the compass itself). Performance testing was also important here, as the compass would not allow rapid reads in quick succession; we inserted nops in the `imu_mag_read_data(int * destination)` for this reason.
-- Compass calibration: We tested incrementally, first using hard-coded maximum and minimum observed values outputted from the IMU, and then with values taken from a self-calibration in which the robot would spin in a circle, and the PIC would record the largest and smallest values it saw on the X- and Y-axes.
-
-Whole system
-- Some subsystem testing was required for the servo with the IMUs, for turning/driving straight with feedback. We debugged by reading in IMU values via UART and observing the robot's turns.
-- We tested extensively with the beacon and two hunters in different environments. Most of our initial testing was in a large, open space with a few metal tables on the periphery. We later tested in the lab in the Digital Lab (Phillips 238), and in the hallway where our demo took place. The confined space of the inside of the lab and hallway, as well as the presence of more reflective bodies (metal doors, tables, people) negatively impacted the performance of our hunters, and it was necessary to recalibrate the hunters to work better in the demo environment.
-
 #### Gradient Descent
 
 The algorithm for deciding what path to follow is a basic version of gradient descent. The following image represents the decision-making fsm, where the starting state is **Measure rssi twice, take average**.
@@ -239,6 +222,26 @@ We also implemented and tested the following improved version that allows for co
 ![](turn_correction.png)
 
 It did not prove much more accurate than randomized gradient descent, largely due to noisy readings from IMU and Bluetooth signal strength.
+
+### Testing
+
+#### Bluetooth
+
+Once we flashed the Bluetooth chips with the proper firmware, we used the [LightBlue](https://itunes.apple.com/us/app/lightblue-explorer/id557428110?mt=8) app to test communications.
+Using the app, we could discover the Bluetooth chips, and send and receive data.
+By initially using a the iPhone app, which was known to work, we could debug the Bluetooth chips in isolation.
+Once that worked, we had the chips communicate with each other.
+Finally, we had the chips take RSSI measurements.
+
+
+#### IMU
+- Basic I2C: Basic testing was required to ensure I2C communication with the chip was working. This included testing the correctness of the I2C read and write functions (including the order of starts, restarts, and idles in accordance with the I2C protocol and the chip datasheets), as well basic parameters like the address of the MPU-9250 and its registers.
+- Compass I2C: This was more complex, and mostly involved testing the usage of the modes of both the MPU-9250 (IMU module) and the AK8963 (the compass itself). Performance testing was also important here, as the compass would not allow rapid reads in quick succession; we inserted nops in the `imu_mag_read_data(int * destination)` for this reason.
+- Compass calibration: We tested incrementally, first using hard-coded maximum and minimum observed values outputted from the IMU, and then with values taken from a self-calibration in which the robot would spin in a circle, and the PIC would record the largest and smallest values it saw on the X- and Y-axes.
+
+#### Whole system
+- Some subsystem testing was required for the servo with the IMUs, for turning/driving straight with feedback. We debugged by reading in IMU values via UART and observing the robot's turns.
+- We tested extensively with the beacon and two hunters in different environments. Most of our initial testing was in a large, open space with a few metal tables on the periphery. We later tested in the lab in the Digital Lab (Phillips 238), and in the hallway where our demo took place. The confined space of the inside of the lab and hallway, as well as the presence of more reflective bodies (metal doors, tables, people) negatively impacted the performance of our hunters, and it was necessary to recalibrate the hunters to work better in the demo environment.
 
 ## Results
 <!-- How fast was it? How accurate was it? What were the error ranges? -->
