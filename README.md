@@ -122,6 +122,10 @@ The robots were programmed in C, using the [MPLAB X IDE](http://www.microchip.co
     However, since they were in the header file, if multiple source files included the header file, there would be linking errors due to duplicate definitions of symbols.
     Moving the protothreads functions to a separate file resolved this issue.
 
+#### BLE
+
+The BLE module used UART, at 9600 baud 8N1. We used `UART1` on the PIC for communicating with the BLE module, and used `UART2` for communicating with the computer.
+
 #### Gradient Descent
 
 The algorithm for deciding what path to follow is a basic version of gradient descent. The following image represents the decision-making fsm, where the starting state is **Measure rssi twice, take average**.
@@ -135,7 +139,7 @@ We also implemented and tested the following improved version that allows for co
 It did not prove much more accurate than randomized gradient descent, largely due to noisy readings from IMU and Bluetooth signal strength.
 
 #### IMU
-The PIC commmunicates with the IMU via I2C. The IMU  (sold by Adafruit) includes a breakout board for the QFN MPU-9250 module, which itself includes 2 dies. One contains the 3-axis gyroscope and 3-axis accelerometer, which were not used in this project, and the other die is the AK8963 3-axis magnetometer (compass). 
+The PIC commmunicates with the IMU via I2C. The IMU  (sold by Adafruit) includes a breakout board for the QFN MPU-9250 module, which itself includes 2 dies. One contains the 3-axis gyroscope and 3-axis accelerometer, which were not used in this project, and the other die is the AK8963 3-axis magnetometer (compass).
 
 It is connected to the rest of the MPU module via an auxillary I2C bus, so it is not connected to the MPU's  main I2C bus by default. While the accelerometer and gyroscope registers can be read after powering up the IMU, the compass also needs pass-through mode to be enabled on the IMU to make it an accessible slave on the I2C bus. This is explained further in [I2C](#i2c).
 
@@ -143,16 +147,16 @@ Some useful functions as defined in [`imu.h`](generated/imu.h.html) are describe
 
 * `void imu_init()`: Initializes the MPU-9250, including configuring the chip to allow reading the compass (for more, see [I2C](#i2c)).
 * `int imu_get_heading()`  Returns the heading of the robot as a value between -180 and 180. The compasses were not completely calibrated to find magnetic north; it only ensures angles are correct relevant to past headings.
-* `void imu_mag_read_data(int * destination)` Fetches compass readings; saves register values into `destination` in the form `[x, y, z]`. 
+* `void imu_mag_read_data(int * destination)` Fetches compass readings; saves register values into `destination` in the form `[x, y, z]`.
 * `int angle_diff(int source, int target)` Gets the difference between two angles in degrees to account for discontinuity between -180 and 180 degrees.
-* `int degree(int deg)`: Offsets degree values so that they fall within the range -180 to 180 degrees. 
+* `int degree(int deg)`: Offsets degree values so that they fall within the range -180 to 180 degrees.
 
-Initializing the IMU involves opening the I2C module, and then configuring the IMU. 
+Initializing the IMU involves opening the I2C module, and then configuring the IMU.
 
 1. We open the `I2C2` module; `I2C1` uses pins already used by the connections to the Bluetooth module. We open it with the baud rate generator value `BRG = (Fpb / 2 / baudrate) - 2 = 4e7 / 2 / 4e5 - 2 = 48`, as specified for `OpenI2C2()` in the [peripheral libraries](#references).
-2. Pass through is enabled, interrupts for data ready are enabled, the IMU as an I2C master function is disabled, and the sensor is powered up. 
+2. Pass through is enabled, interrupts for data ready are enabled, the IMU as an I2C master function is disabled, and the sensor is powered up.
 
-This enables the PIC to talk to the AK8963. The AK8963 has in several modes of operation, and the chip must be set to power-down mode before switching to other modes. We read the IMU with single measurement mode, as specified below: 
+This enables the PIC to talk to the AK8963. The AK8963 has in several modes of operation, and the chip must be set to power-down mode before switching to other modes. We read the IMU with single measurement mode, as specified below:
 
 ![IMU single measurement mode](imu_single_measurement.png)
 
