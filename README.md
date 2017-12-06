@@ -126,7 +126,7 @@ The robots were programmed in C, using the [MPLAB X IDE](http://www.microchip.co
 
 The algorithm for deciding what path to follow is a basic version of gradient descent. The following image represents the decision-making fsm, where the starting state is **Measure rssi twice, take average**.
 
-![Gradient descent fsm](grad_descent.png)
+![Gradient descent fsm](grad_desc.png)
 
 We also implemented and tested the following improved version that allows for correction; a car that has just moved forward and detected a weakened signal does not know whether the beacon to its left or right. If after turning, the signal is still weaker, it has picked the wrong turn. This decision process corrects this:
 
