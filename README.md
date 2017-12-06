@@ -122,8 +122,44 @@ The robots were programmed in C, using the [MPLAB X IDE](http://www.microchip.co
     However, since they were in the header file, if multiple source files included the header file, there would be linking errors due to duplicate definitions of symbols.
     Moving the protothreads functions to a separate file resolved this issue.
 
+#### IMU
+The PIC commmunicates with the IMU via I2C. The IMU  (sold by Adafruit) includes a breakout board for the QFN MPU-9250 module, which itself includes 2 dies. One contains the 3-axis gyroscope and 3-axis accelerometer, which were not used in this project, and the other die is the AK8963 3-axis magnetometer (compass). 
+
+It is connected to the rest of the MPU module via an auxillary I2C bus, so it is not connected to the MPU's  main I2C bus by default. While the accelerometer and gyroscope registers can be read after powering up the IMU, the compass also needs pass-through mode to be enabled on the IMU to make it an accessible slave on the I2C bus. This is explained further in [I2C](#i2c).
+
+Some useful functions as defined in [`imu.h`](generated/imu.h.html) are described below:
+
+* `void imu_init()`: Initializes the MPU-9250, including configuring the chip to allow reading the compass (for more, see [I2C](#i2c)).
+* `int imu_get_heading()`  Returns the heading of the robot as a value between -180 and 180. The compasses were not completely calibrated to find magnetic north; it only ensures angles are correct relevant to past headings.
+* `void imu_mag_read_data(int * destination)` Fetches compass readings; saves register values into `destination` in the form `[x, y, z]`. 
+* `int angle_diff(int source, int target)` Gets the difference between two angles in degrees to account for discontinuity between -180 and 180 degrees.
+* `int degree(int deg)`: Offsets degree values so that they fall within the range -180 to 180 degrees. 
+
+
 ## Documentation
 <!-- Include here drawings and program listings, together with any explanatory comments needed. -->
+
+### I2C
+
+Initializing the IMU involves opening the I2C module, and then configuring the IMU. 
+
+1. We open the `I2C2` module; `I2C1` uses pins already used by the connections to the Bluetooth module. We open it with the baud rate generator value `BRG = (Fpb / 2 / baudrate) - 2 = 4e7 / 2 / 4e5 - 2 = 48`, as specified for `OpenI2C2()` in the [peripheral libraries](#references).
+2. Pass through is enabled, interrupts for data ready are enabled, the IMU as an I2C master function is disabled, and the sensor is powered up. 
+
+This enables the PIC to talk to the AK8963. The AK8963 has in several modes of operation, and the chip must be set to power-down mode before switching to other modes. We read the IMU with single measurement mode, as specified below: 
+
+![IMU single measurement mode](imu_single_measurement.png)
+
+1. First set the compass to single measurement mode in 14 bit resolution.
+2. Read the 6 data registers (X low, X high, Y low, Y high, Z low, Z high)
+3. Read the Status 2 register to check for magnetic sensor overflow. Without reading this register, the read is not considered complete and further reads will fail.
+4. Wait; if the IMU is read too frequently, it will not have enough time to take measurements..
+
+Additional helper methods used in I2C were defined in [`imu.c`](generated/imu.c.html):
+
+* `i2c_read_device(char device, char address)` Reads the data from a single register at `address`
+* `i2c_write_byte(char device, char address, char data)` All configurations used in this project involved writing single bytes of data.
+* `i2c_wait(int cnt)` Writes 2 nops; reads require time to return a value, and calling reads consecutively 
 
 ## Results
 <!-- How fast was it? How accurate was it? What were the error ranges? -->
