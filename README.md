@@ -15,9 +15,9 @@ The cars and base station used a Bluetooth Low Energy (BLE) 4.0 module to take t
 Each unit was powered with 3 AA batteries.
 Finally, the chassis and wheels of each car were 3D printed.
 
-### Video
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/g5H4cLJBA_Q?rel=0" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
 
 
 ## Design
@@ -54,6 +54,19 @@ There are three files, [`frame.scad`](generated/frame.scad.html), [`drag.scad`](
 
 The parts were printed in ABS using [Maker Select 3D Printer v2](https://www.monoprice.com/product?c_id=107&cp_id=10724&cs_id=1072403&p_id=13860&seq=1&format=2) printers. All parts were printed
 with a layer height of 0.3 mm, as there was no need for a smooth finish or high tolerances. The parts where sliced with [Cura](https://ultimaker.com/en/products/ultimaker-cura-software).
+
+### Pictures
+
+Full system (base station and 2 robots):
+
+![](full_system.jpg){ width=50% }
+
+Multiple views of the robots:
+
+------------------------------ ------------------------------
+![Top view](top_view.jpg)      ![Side view](side_view.jpg)
+![Front view](front_view.jpg)  ![Inside](inside_view.jpg)
+------------------------------ ------------------------------
 
 ### Electronics
 
