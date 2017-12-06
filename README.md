@@ -165,7 +165,7 @@ This enables the PIC to talk to the AK8963. The AK8963 has in several modes of o
 3. Read the Status 2 register to check for magnetic sensor overflow. Without reading this register, the read is not considered complete and further reads will fail.
 4. Wait; if the IMU is read too frequently, it will not have enough time to take measurements.
 
-Additional helper methods used in I2C were defined in [`imu.c`](generated/imu.c.html):
+Additional helper methods used in I2C were defined in [`imu.c`](generated/imu.c.html). These are largely based on the files from the [self-balancing robot](#code-and-designs-borrowed-from-others).
 
 * `char i2c_read_device(char device, char address)` Reads the data from a single register at `address`
 * `void i2c_write_byte(char device, char address, char data)` All configurations used in this project involved writing single bytes of data.
@@ -232,19 +232,11 @@ This assignment was an interesting exploration into short-range distance determi
 
 Our hunting bots had reliable performance when they stayed within 1 m of the beacon. After this rough threshold, the signal strength from the beacon (already noisy) would only make a shallow gradient that the hunting bot could not consistently follow. Our bots also worked better in larger, more open spaces, preferably without metal structures like tables or doors nearby. Both of these are reasonable given the operating range of BLE 4.0. 
 
-TODO: 
+We reused some of the code from the [Self-Balancing Robot](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/index.html) as [cited](#code-and-designs-borrowed-from-others) in  our references section, and explained in [IMU](#imu). The rest of the design is ours, and is not an infringement on intellectual property.
 
-<!-- Intellectual property considerations.
-Did you reuse code or someone else's design?
-Did you use code in the public domain? -->
+TODO: maybe mention the firmware flashing stuff?
 
-
-We did not reverse-engineer any technology, and did not encounter any issues with trademarks or patents. We did not have to sign non-disclosure to get a sample part.
-
-
-<!-- Are there patent opportunites for your project?
-Are there publishing opportunities for your project? -->
-
+We did not reverse-engineer any technology, and did not encounter any issues with trademarks or patents. We did not have to sign non-disclosure to get a sample part. We don't wish to patent this project. We hope to further polish our findings and report, and will aim to publish them in a print magazine, ideally as a part of ECE 4920.
 
 There are many potential avenues for improvements or further development. In addition to more circumstantial difficulties encountered during the project work period (such as extremely uneven servos), two areas of potential improvmeent are as follows:
 
@@ -353,7 +345,7 @@ A block diagram is not a schematic.
 *   [HM-10 (Bluetooth breakout module & firmware)](http://www.jnhuamao.cn/bluetooth40_en.zip). The ZIP contains the original data sheet, as well as other documentation. [MIT has a PDF](http://fab.cba.mit.edu/classes/863.15/doc/tutorials/programming/bluetooth/bluetooth40_en.pdf) available, which may me out of date, but is easier to get to.
 *   [PIC32MX250](http://ww1.microchip.com/downloads/en/DeviceDoc/60001168J.pdf).
 
-#### Code/designs borrowed from others
+#### Code and Designs borrowed from others
 
 *   [Self-Balancing Robot](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/index.html) by Desmond Caulley (dc686@cornell.edu), Nadav Nehoran (nn233@cornell.edu), Sherry Zhao (hz263@cornell.edu). In particular, we borrowed extensively from their [i2c_helper.h](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/dc686_nn233_hz263/i2c_helper.h).
 
