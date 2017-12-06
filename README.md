@@ -299,7 +299,7 @@ While the chip reported RSSI in units proportional to dBm, and we measured dista
 The constants $A$ and $n$, provided we determined them empirically based on the data, would encode the conversions.
 As such, we fit the data using the above formula with $A=-48$ and $n=3$, resulting in the blue curve above.
 While the general shape of the curve matches, there is significant noise in the averaged RSSI data.
-Furthermore, when we tried to reproduce the measurements, we could not do so accurately -- it seemed to even depend on where our feet where! See [Appendix B](#rssi-data) for the source data for the table.
+Furthermore, when we tried to reproduce the measurements, we could not do so precisely -- it seemed to even depend on where our feet where! See [Appendix B](#rssi-data) for the source data for the table.
 
 Despite how noisy the RSSI measurements where, the robots were still able to perform a reasonably accurate gradient descent. In most cases, at least one of the 2 robots would find the beacon in a matter of minutes.
 
@@ -331,10 +331,10 @@ We reused some of the code from the [Self-Balancing Robot](https://people.ece.co
 
 We did not reverse-engineer any technology, and did not encounter any issues with trademarks or patents. We did not have to sign non-disclosure to get a sample part. We hope to further polish our findings and report, and will aim to publish them in a print magazine, ideally as a part of ECE 4920.
 
-There are many potential avenues for improvements or further development. In addition to more circumstantial difficulties encountered during the project work period (such as extremely uneven servos), two areas of potential improvement are as follows:
+There are many potential avenues for improvements or further development. In addition to more circumstantial difficulties encountered during the project work period (such as extremely unbalanced servos, where one always ran faster than the other), two areas of potential improvement are as follows:
 
-- *Communication between the two robots*. The strengths of Bluetooth are certainly not distance measurement by RSSI, but the reliable communication between modules. It would be straightforward for one hunting robot to inform the other whether it believes it is approaching the beacon or not. In the simplest case, a hunting robot that is approaching, or already at, the beacon can provide a second point of reference for a currently hunting robot.
-- *More complete usage of IMU*. A lot of development time was spent simply on getting the PIC to compass communication running, and not much time was spent on calibrating the sensor or processing the data. Given more time, we could continue to work towards dead reckoning of the mobile robots. This, paired with inter-swarm communication, would make for a much more sophisticated and likely much more efficient system. (Of course, this does not resolve the shallow gradients problem -- but it would allow the approach to the beacon to be much faster.)
+- *Communication between the two robots*. The advantage of Bluetooth is certainly not distance measurement by RSSI, but the reliable communication between modules. It would be straightforward for one hunting robot to inform the other whether it believes it is approaching the beacon or not. In the simplest case, a hunting robot that is approaching, or already at, the beacon can provide a second point of reference for a currently hunting robot.
+- *More complete usage of IMU*. A lot of development time was spent simply on getting the PIC to compass communication running, and not much time was spent on calibrating the sensor or processing the data. Given more time, we could continue to work towards dead reckoning position estimates of the mobile robots. This, paired with inter-swarm communication, would make for a much more sophisticated and likely much more efficient system. (Of course, this does not resolve the shallow gradients problem -- but it would allow the approach to the beacon to be much faster.)
 
 
 
@@ -342,7 +342,7 @@ There are many potential avenues for improvements or further development. In add
 
 Our project, as well as the design and creation project thereof,  adheres to the [IEEE Code of Ethics](https://www.ieee.org/about/ethics.html). The project itself is relatively small and physically self-contained; it did not have any immediate impact on the environment or safety and health of potential users, we the creators, or any others. We chose the project's topic out of interest and for a challenge, without any conflict of interest. Our report is honest and realistic; none of our data is fabricated, and our conclusions reflect our hard findings. We did not accept any form of bribery.
 
-The project investigated the use of an emerging and popular technology (BLE) in a new application (distance sensing). We challenged ourselves while not attempting tasks we were not qualified to do. We consistently received and built upon advice from our TAs and professor Bruce Land, and cite the work we used in the basis of our project.
+The project investigated the use of an emerging and popular technology (BLE) in a new application (distance sensing). We consistently received and built upon advice from our TAs and professor Bruce Land, and cite the work we used in the basis of our project.
 
 Additionally, neither we nor our project presented any act of discrimination, and our project does not injure others in any way. We assisted our colleagues (both fellow group members and other classmates) when the occasion arose, such as by offering help debugging or lending a spare module before a demo.
 
