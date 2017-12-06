@@ -122,6 +122,18 @@ The robots were programmed in C, using the [MPLAB X IDE](http://www.microchip.co
     However, since they were in the header file, if multiple source files included the header file, there would be linking errors due to duplicate definitions of symbols.
     Moving the protothreads functions to a separate file resolved this issue.
 
+#### Gradient Descent
+
+The algorithm for deciding what path to follow is a basic version of gradient descent. The following image represents the decision-making fsm, where the starting state is **Measure rssi twice, take average**.
+
+![Gradient descent fsm](grad_descent.png)
+
+We also implemented and tested the following improved version that allows for correction; a car that has just moved forward and detected a weakened signal does not know whether the beacon to its left or right. If after turning, the signal is still weaker, it has picked the wrong turn. This decision process corrects this:
+
+![Turn-corrected grdaient dsecent](turn_correction.png)
+
+It did not prove much more accurate than randomized gradient descent, largely due to noisy readings from IMU and Bluetooth signal strength.
+
 #### IMU
 The PIC commmunicates with the IMU via I2C. The IMU  (sold by Adafruit) includes a breakout board for the QFN MPU-9250 module, which itself includes 2 dies. One contains the 3-axis gyroscope and 3-axis accelerometer, which were not used in this project, and the other die is the AK8963 3-axis magnetometer (compass). 
 
@@ -134,12 +146,6 @@ Some useful functions as defined in [`imu.h`](generated/imu.h.html) are describe
 * `void imu_mag_read_data(int * destination)` Fetches compass readings; saves register values into `destination` in the form `[x, y, z]`. 
 * `int angle_diff(int source, int target)` Gets the difference between two angles in degrees to account for discontinuity between -180 and 180 degrees.
 * `int degree(int deg)`: Offsets degree values so that they fall within the range -180 to 180 degrees. 
-
-
-## Documentation
-<!-- Include here drawings and program listings, together with any explanatory comments needed. -->
-
-### I2C
 
 Initializing the IMU involves opening the I2C module, and then configuring the IMU. 
 
@@ -157,7 +163,8 @@ This enables the PIC to talk to the AK8963. The AK8963 has in several modes of o
 
 Additional helper methods used in I2C were defined in [`imu.c`](generated/imu.c.html):`dress)` Reads the data from a single register at `address`
 * `i2c_write_byte(char device, char address, char data)` All configurations used in this project involved writing single bytes of data.
-* `i2c_wait(int cnt)` Writes 2 nops; reads require time to return a value, and calling reads consecutively 
+* `i2c_wait(int cnt)` Writes 2 nops; reads require time to return a value, and calling reads consecutively.
+
 
 ## Results
 <!-- How fast was it? How accurate was it? What were the error ranges? -->
