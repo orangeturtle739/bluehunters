@@ -117,7 +117,14 @@
 \hypertarget{introduction}{%
 \subsection{Introduction}\label{introduction}}
 
-We built 2 small cars which used Bluetooth Received Signal Strength
+Position estimation and navigation for robots is an interesting problem
+in the field of robotics. We investigate the challenge of determining
+relative position using signal strength; by placing a moving robot on
+the same plane as a beacon, oriented and positioned randomly, the
+robot can hunt out and move towards the beacon by itself. We discuss 
+our procedures and challenges we encountered in this article.
+
+Specifically, we built 2 small cars which used Bluetooth Received Signal Strength
 Indicator (RSSI) measurements to navigate towards a stationary base
 station. The cars and base station used a Bluetooth Low Energy (BLE) 4.0
 module to take the measurements and a PIC32MX250 microcontroller. The
@@ -128,6 +135,8 @@ printed.
 
 \hypertarget{design}{%
 \subsection{Design}\label{design}}
+
+The design of the project can be split into 3 main parts: the chassis, the electronics (hardware), and the software. The following sections discuss implementation details.
 
 \hypertarget{chassis}{%
 \subsubsection{Chassis}\label{chassis}}
