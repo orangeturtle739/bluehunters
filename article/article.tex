@@ -126,9 +126,6 @@ turn, as well as 2 micro 9 g servos to drive. Each unit was powered with
 3 AA batteries. Finally, the chassis and wheels of each car were 3D
 printed.
 
-\hypertarget{video}{%
-\subsubsection{Video}\label{video}}
-
 \hypertarget{design}{%
 \subsection{Design}\label{design}}
 
@@ -797,122 +794,11 @@ improvement are as follows:
   beacon to be much faster.)
 \end{itemize}
 
-\hypertarget{ieee-code-of-ethics}{%
-\subsubsection{IEEE Code of Ethics}\label{ieee-code-of-ethics}}
-
-Our project, as well as the design and creation project thereof, adheres
-to the \href{https://www.ieee.org/about/ethics.html}{IEEE Code of
-Ethics}. The project itself is relatively small and physically
-self-contained; it did not have any immediate impact on the environment
-or safety and health of potential users, we the creators, or any others.
-We chose the project's topic out of interest and for a challenge,
-without any conflict of interest. Our report is honest and realistic;
-none of our data is fabricated, and our conclusions reflect our hard
-findings. We did not accept any form of bribery.
-
-The project investigated the use of an emerging and popular technology
-(BLE) in a new application (distance sensing). We consistently received
-and built upon advice from our TAs and professor Bruce Land, and cite
-the work we used in the basis of our project.
-
-Additionally, neither we nor our project presented any act of
-discrimination, and our project does not injure others in any way. We
-assisted our colleagues (both fellow group members and other classmates)
-when the occasion arose, such as by offering help debugging or lending a
-spare module before a demo.
-
-Overall, our project complies with the IEEE Policies, 7.8 Code of
-Ethics.
-
 \hypertarget{appendices}{%
 \subsection{Appendices}\label{appendices}}
 
-\hypertarget{appendix-a-legal-considerations}{%
-\subsubsection{Appendix A: Legal
-Considerations}\label{appendix-a-legal-considerations}}
-
-\begin{itemize}
-\tightlist
-\item
-  The group approves this report for inclusion on the course website.
-\item
-  The group approves the video for inclusion on the course youtube
-  channel.
-\item
-  The TI CC2541 meets FCC CFR47 Part 15 requirements. \footnote{See the
-    top of page 8 of \url{http://www.ti.com/lit/ds/symlink/cc2541.pdf}
-    for compliance information.}
-\end{itemize}
-
-\hypertarget{appendix-b-source-listing}{%
-\subsubsection{Appendix B: Source
-Listing}\label{appendix-b-source-listing}}
-
-Our source code can be found
-\href{https://github.com/orangeturtle739/bluehunters}{on Github}. Each
-file can also be found below:
-
-\hypertarget{code}{%
-\paragraph{Code}\label{code}}
-
-\begin{itemize}
-\tightlist
-\item
-  \href{generated/ble.c.html}{\texttt{ble.c}}
-\item
-  \href{generated/ble.h.html}{\texttt{ble.h}}
-\item
-  \href{generated/imu.c.html}{\texttt{imu.c}}
-\item
-  \href{generated/imu.h.html}{\texttt{imu.h}}
-\item
-  \href{generated/servo.c.html}{\texttt{servo.c}}
-\item
-  \href{generated/servo.h.html}{\texttt{servo.h}}
-\item
-  \href{generated/pt_cornell_1_2_2.c.html}{\texttt{pt\_cornell\_1\_2\_2.c}}
-\item
-  \href{generated/pt_cornell_1_2_2.h.html}{\texttt{pt\_cornell\_1\_2\_2.h}}
-\item
-  \href{generated/main.c.html}{\texttt{main.c}}
-\item
-  \href{generated/main.h.html}{\texttt{main.h}}
-\item
-  \href{generated/config_1_2_2.h.html}{\texttt{config\_1\_2\_2.h}}
-\end{itemize}
-
-\hypertarget{cad}{%
-\paragraph{CAD}\label{cad}}
-
-\hypertarget{sources}{%
-\subparagraph{Sources}\label{sources}}
-
-\begin{itemize}
-\tightlist
-\item
-  \href{generated/main.scad.html}{\texttt{main.scad}}
-\item
-  \href{generated/frame.scad.html}{\texttt{frame.scad}}
-\item
-  \href{generated/wheel.scad.html}{\texttt{wheel.scad}}
-\item
-  \href{generated/drag.scad.html}{\texttt{drag.scad}}
-\item
-  \href{generated/concept.scad.html}{\texttt{concept.scad}}
-\end{itemize}
-
-\hypertarget{stl}{%
-\subparagraph{STL}\label{stl}}
-
-\begin{itemize}
-\tightlist
-\item
-  \href{stl/frame.stl}{\texttt{frame.stl}}
-\item
-  \href{stl/wheel.stl}{\texttt{wheel.stl}}
-\item
-  \href{stl/drag.stl}{\texttt{drag.stl}}
-\end{itemize}
+\hypertarget{appendix-c-schematics}{%
+\subsubsection{Appendix A: Data}\label{appendix-c-schematics}}
 
 \hypertarget{rssi-data}{%
 \paragraph{RSSI data}\label{rssi-data}}
@@ -935,7 +821,7 @@ RSSI\tabularnewline
 \end{longtable}
 
 \hypertarget{appendix-c-schematics}{%
-\subsubsection{Appendix C: Schematics}\label{appendix-c-schematics}}
+\subsubsection{Appendix B: Schematics}\label{appendix-c-schematics}}
 
 \includegraphics{schematic.png}
 
@@ -1071,48 +957,6 @@ Lab\strut
 \end{longtable}
 
 \textbf{Total:} \$97.68
-
-\hypertarget{appendix-e-work-distribution}{%
-\subsubsection{Appendix E: Work
-Distribution}\label{appendix-e-work-distribution}}
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Jacob:}
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Bluetooth firmware hacking
-  \item
-    Bluetooth UART code
-  \item
-    CAD design \& 3D printing
-  \end{itemize}
-\item
-  \textbf{Jane:}
-
-  \begin{itemize}
-  \tightlist
-  \item
-    I2C IMU code
-  \item
-    Robot motion code and gradient descent algorithm
-  \end{itemize}
-\item
-  \textbf{Justin:}
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Servo control code
-  \item
-    Board assembly (3 small boards and our 3 of our protoboards)
-  \item
-    Schematic
-  \end{itemize}
-\end{itemize}
 
 \hypertarget{references}{%
 \subsubsection{References}\label{references}}
