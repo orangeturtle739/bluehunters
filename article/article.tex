@@ -6,14 +6,9 @@
 \usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
 \usepackage{fixltx2e} % provides \textsubscript
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
-  \usepackage[T1]{fontenc}
-  \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provides euro and other symbols
-\else % if luatex or xelatex
-  \usepackage{unicode-math}
-  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
-\fi
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{textcomp} % provides euro and other symbols
 % use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 % use microtype if available
@@ -121,7 +116,7 @@ Position estimation and navigation for robots is an interesting problem
 in the field of robotics. We investigate the challenge of determining
 relative position using signal strength; by placing a moving robot on
 the same plane as a beacon, oriented and positioned randomly, the
-robot can hunt out and move towards the beacon by itself. We discuss 
+robot can hunt out and move towards the beacon by itself. We discuss
 our procedures and challenges we encountered in this article.
 
 Specifically, we built 2 small cars which used Bluetooth Received Signal Strength
@@ -424,7 +419,7 @@ chip will ignore them.
 \paragraph{IMU}\label{imu}}
 
 The PIC commmunicates with the IMU via I2C. The IMU includes a breakout
-board for the QFN MPU-9250 module, which itself includes 2 dies. One
+board for the QFN MPU-9250 \cite{mpu9250datasheet} \cite{mpu9250regmap} module, which itself includes 2 dies. One
 contains the 3-axis gyroscope and 3-axis accelerometer, which were not
 used in this project, and the other die is the AK8963 3-axis
 magnetometer (compass).
@@ -976,11 +971,6 @@ Lab\strut
 \begin{itemize}
 \tightlist
 \item
-  \href{https://www.invensense.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf}{MPU-9250}
-  and
-  \href{https://cdn.sparkfun.com/assets/learn_tutorials/5/5/0/MPU-9250-Register-Map.pdf}{its
-  register map}.
-\item
   \href{https://www.akm.com/akm/en/file/datasheet/AK8963C.pdf}{3-axis
   Electronic Compass on IMU}.
 \item
@@ -1020,5 +1010,9 @@ others}\label{code-and-designs-borrowed-from-others}}
   Website template:
   \url{https://github.com/tajmone/pandoc-goodies/tree/master/templates/html5/github}.
 \end{itemize}
+
+\bibliography{references}{}
+\bibliographystyle{ieeetr}
+
 
 \end{document}
