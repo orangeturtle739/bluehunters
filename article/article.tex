@@ -279,54 +279,16 @@ Based on their instructions \cite{jnhuamaoinstructions}, we flashed our chips:
 
 \subsubsection{Software}
 
-The robots were programmed in C, using the
-\href{http://www.microchip.com/mplab/mplab-x-ide}{MPLAB X IDE} v4.0,
-with the \href{http://www.microchip.com/mplab/compilers}{XC32} v1.4
-compiler and the
-\href{http://www.microchip.com/SWLibraryWeb/product.aspx?product=PIC32\%20Peripheral\%20Library}{PIC
-32 Legacy Peripheral Library (plib)}. The full source code is available
-in
-\href{https://github.com/orangeturtle739/bluehunters/tree/master/ble.X}{our
-git repository} and
-\protect\hyperlink{appendix-b-source-listing}{below}. The code is
-divided into 5 main units:
-
-\begin{itemize}
-\tightlist
-\item
-  \href{generated/ble.c.html}{\texttt{ble.c}}: contains all the
-  functions for interacting with the BLE device over UART.
-\item
-  \href{generated/imu.c.html}{\texttt{imu.c}}: contains all the
-  functions for interacting with the IMU (which contained the
-  magnetometer) over I2C.
-\item
-  \href{generated/servo.c.html}{\texttt{servo.c}}: contains all the
-  functions for interacting with the servos using PWM.
-\item
-  \href{generated/main.c.html}{\texttt{main.c}}: the main code.
-\item
-  \href{generated/pt_cornell_1_2_2.c.html}{\texttt{pt\_cornell\_1\_2\_2.c}}:
-  contains the functions which were originally declared in the
-  protothreads header file. However, since they were in the header file,
-  if multiple source files included the header file, there would be
-  linking errors due to duplicate definitions of symbols. Moving the
-  protothreads definitions to a separate file resolved this issue.
-\end{itemize}
+The robots were programmed in C, using MPLAB X IDE v4.0, the XC32 v1.4
+compiler and the PIC 32 Legacy Peripheral Library (plib).
+The full source code is available in online: \url{https://github.com/orangeturtle739/bluehunters/tree/master/ble.X}.
 
 \paragraph{BLE}
 
 The BLE module used UART, at 9600 baud 8N1. We used \texttt{UART1} on
 the PIC for communicating with the BLE module, and used \texttt{UART2}
-for communicating with the computer (for debugging). The BLE files
-define a series of macros and \texttt{PT\_THREAD} functions for printing
-characters and reading lines in a non-blocking fashion using
-protothreads. All of the \texttt{PT\_THREAD} functions can be spawned
-with \texttt{PT\_SPAWN} to run them.
-
-The \href{generated/main.c.html}{\texttt{main.c}} file contains a thread
-which does all the communication with the Bluetooth chip using these
-functions. The commands it sends to the chip are:
+for communicating with the computer (for debugging).
+We used the following commands to interact with the bluetooth chip:
 
 \begin{itemize}
 \item
@@ -391,75 +353,30 @@ chip will ignore them.
 
 \paragraph{IMU}
 
-The PIC commmunicates with the IMU via I2C. The IMU includes a breakout
-board for the QFN MPU-9250 \cite{mpu9250datasheet} \cite{mpu9250regmap} module, which itself includes 2 dies. One
-contains the 3-axis gyroscope and 3-axis accelerometer, which were not
+The PIC communicates with the IMU via I2C.
+The IMU includes a breakout board for the QFN MPU-9250 \cite{mpu9250datasheet} \cite{mpu9250regmap} module, which itself includes 2 dies.
+One contains the 3-axis gyroscope and 3-axis accelerometer, which were not
 used in this project, and the other die is the AK8963 3-axis
 magnetometer (compass). \cite{ak8963cdatasheet}
 
-It is connected to the rest of the MPU module via an auxillary I2C bus,
+It is connected to the rest of the MPU module via an auxiliary I2C bus,
 so it is not connected to the MPU's main I2C bus by default. While the
 accelerometer and gyroscope registers can be read after powering up the
 IMU, the compass also needs pass-through mode to be enabled on the IMU
-to make it an accessible slave on the I2C bus.
-
-Some useful functions as defined in
-\href{generated/imu.h.html}{\texttt{imu.h}} are described below:
-
-\begin{itemize}
-\tightlist
-\item
-  \texttt{void\ imu\_init()}: Initializes the MPU-9250, including
-  configuring the chip to allow reading the compass.
-\item
-  \texttt{int\ imu\_get\_heading()} Returns the heading of the robot as
-  a value between -180 and 180. The compasses were not completely
-  calibrated to find magnetic north; it only ensures angles are correct
-  relevant to past headings.
-\item
-  \texttt{void\ imu\_mag\_read\_data(int\ *\ destination)} Fetches
-  compass readings; saves register values into \texttt{destination} in
-  the form \texttt{{[}x,\ y,\ z{]}}.
-\item
-  \texttt{int\ angle\_diff(int\ source,\ int\ target)} Gets the
-  difference between two angles in degrees to account for discontinuity
-  between -180 and 180 degrees.
-\item
-  \texttt{int\ degree(int\ deg)}: Offsets degree values so that they
-  fall within the range -180 to 180 degrees.
-\end{itemize}
-
-Initializing the IMU involves opening the I2C module, and then
-configuring the IMU.
-
-We based our IMU code off of the \texttt{i2c\_helper.h} from the Self-Balancing Robot project. \cite{selfbalancingrobot}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  We open the \texttt{I2C2} module; \texttt{I2C1} uses pins already used
-  by the connections to the Bluetooth module. We open it with the baud
-  rate generator value
-  \texttt{BRG\ =\ (Fpb\ /\ 2\ /\ baudrate)\ -\ 2\ =\ 4e7\ /\ 2\ /\ 4e5\ -\ 2\ =\ 48},
-  as specified for \texttt{OpenI2C2()} in the
-  \protect\hyperlink{references}{peripheral libraries}.
-\item
-  Pass through is enabled, interrupts for data ready are enabled, the
-  IMU as an I2C master function is disabled, and the sensor is powered
-  up.
-\end{enumerate}
-
-This enables the PIC to talk to the AK8963. The AK8963 has several modes
+to make it an accessible slave on the I2C bus. We based our IMU code off of the \texttt{i2c\_helper.h} from the Self-Balancing Robot project. \cite{selfbalancingrobot} The AK8963 has several modes
 of operation, and the chip must be set to power-down mode before
 switching to other modes. We read compass values with single measurement
-mode, as specified below:
+mode, as in figure \ref{fig:imu_single_measurement}.
 
-\includegraphics{imu_single_measurement.png}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\textwidth]{imu_single_measurement.png}
+  \caption{IMU single measurement mode}
+  \label{fig:imu_single_measurement}
+\end{figure}
 
+In order to read the magnetometer, we:
 \begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
 \item
   Set the compass to single measurement mode in 14 bit resolution.
 \item
@@ -474,33 +391,13 @@ mode, as specified below:
   to take measurements.
 \end{enumerate}
 
-Additional helper methods used in I2C were defined in
-\href{generated/imu.c.html}{\texttt{imu.c}}. These are largely based on
-the files from the
-\protect\hyperlink{code-and-designs-borrowed-from-others}{self-balancing
-robot}.
-
-\begin{itemize}
-\tightlist
-\item
-  \texttt{char\ i2c\_read\_device(char\ device,\ char\ address)} Reads
-  the data from a single register at \texttt{address}
-\item
-  \texttt{void\ i2c\_write\_byte(char\ device,\ char\ address,\ char\ data)}
-  All configurations used in this project involved writing single bytes
-  of data.
-\item
-  \texttt{void\ i2c\_wait(int\ cnt)} Writes 2 nops; reads require time
-  to return a value, and calling reads consecutively.
-\end{itemize}
-
 In order to calibrate the compass, the robots spun in place when powered
 on. They recorded the maximum and minimum values for each axes, and used
 that data to scale and center the magnetometer readings.
 
 \paragraph{Servos}
 
-For the drive systems, we used the FS90R servos. These servos are
+For the drive system, we used the FS90R servos. These servos are
 continuous rotation servos with a stall torque of 1.5 kg-cm. Continuous
 rotation servos operate based on PWM duty cycle; since servos operate at
 a pulse width of 1 to 2 ms out of 20 ms, we used a timer with a
@@ -517,138 +414,27 @@ to control the system where both wheels are driven forward or point
 turns where one wheel is turned in one direction and one is turned in
 the other direction.
 
-\paragraph{Protothreads}
-
-While the provided protothreads library was very helpful, it did not
-work correctly when used in multiple compilation units. The reason for
-this was that it defined variables and functions in the header file, so
-if multiple source files included
-\href{generated/pt_cornell_1_2_2.h.html}{\texttt{pt\_cornell\_1\_2\_2.h}},
-linking would fail with duplicate symbol definitions. Furthermore, if
-multiple files included
-\href{generated/config_1_2_2.h.html}{\texttt{config\_1\_2\_2.h}},
-linking would fail with the obscure error:
-
-\begin{verbatim}
-section `.config_BFC00BF4' will not fit in region `config2'
-\end{verbatim}
-
-This happened because if multiple compilation units included
-\texttt{\#pragma\ config} directives (which they did by including a
-\texttt{\#include\ "config\_1\_2\_2.h"} directive), then the linker
-would try to assign too many symbols to the configuration region.
-
-The fix to this was twofold:
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  We modified protothreads to have both a header and source file, with
-  definitions only in the source file.
-\item
-  We only included
-  \href{generated/config_1_2_2.h.html}{\texttt{config\_1\_2\_2.h}} in
-  the main C file, and moved all macro definitions to the protothreads
-  header.
-\end{enumerate}
-
-The updated versions of protothreads can be found in
-\protect\hyperlink{appendix-b-source-listing}{Appendix B}.
-
 \paragraph{Gradient descent}
 
 The algorithm for deciding what path to follow is a basic version of
-gradient descent. The following image represents the decision-making
-state machine, where the starting state is \textbf{Measure rssi twice,
-take average}.
+gradient descent. Figure \ref{fig:graddesc} shows 2 versions of the gradient descent algorithm.
 
-\includegraphics{grad_desc.png}
+\begin{figure}
+  \centering
+  \subfloat[Simple gradient descent]{
+    \includegraphics[width=0.4\textwidth]{grad_desc.png}
+    \label{fig:simplegrad}
+  }
+  \subfloat[Compensating gradient descent]{
+      \includegraphics[width=0.5\textwidth]{turn_correction.png}
+    \label{fig:simplegrad}
+  }
+  \caption{2 gradient descent algorithms. The initial state is \emph{measure RSSI twice, take average}.}
+  \label{fig:graddesc}
+\end{figure}
 
-We also implemented and tested the following improved version that
-allows for correction; a car that has just moved forward and detected a
-weakened signal does not know whether the beacon to its left or right.
-If after turning, the signal is still weaker, it has picked the wrong
-turn. This decision process corrects this (same starting state:
-\textbf{Measure rssi twice, take average}):
-
-\includegraphics{turn_correction.png}
-
-It did not prove much more accurate than randomized gradient descent,
-largely due to noisy readings from IMU and Bluetooth signal strength. As
-such, we used the simplified version.
-
-\subsubsection{Testing}
-
-\paragraph{BLE}
-
-Once we flashed the Bluetooth chips with the proper firmware, we used
-the
-\href{https://itunes.apple.com/us/app/lightblue-explorer/id557428110?mt=8}{LightBlue}
-app to test communications. Using the app, we could discover the
-Bluetooth chips, and send and receive data. By initially using a the
-iPhone app, which was known to work, we could debug the Bluetooth chips
-in isolation. Once that worked, we had the chips communicate with each
-other. Finally, we had the chips take RSSI measurements.
-
-We also experimented with RSSI, as described in
-\protect\hyperlink{results}{results}. This data validated the
-effectiveness of RSSI as an approximate metric for distance measurement,
-though confirmed that it would be highly variable.
-
-\paragraph{IMU}
-
-\begin{itemize}
-\tightlist
-\item
-  Basic I2C: Basic testing was required to ensure I2C communication with
-  the chip was working. This included testing the correctness of the I2C
-  read and write functions (including the order of starts, restarts, and
-  idles in accordance with the I2C protocol and the chip datasheets), as
-  well basic parameters like the address of the MPU-9250 and its
-  registers.
-\item
-  Compass I2C: This was more complex, and mostly involved testing the
-  usage of the modes of both the MPU-9250 (IMU module) and the AK8963
-  (the compass itself). Performance testing was also important here, as
-  the compass would not allow rapid reads in quick succession; we
-  inserted nops in the
-  \texttt{imu\_mag\_read\_data(int\ *\ destination)} for this reason.
-\item
-  Compass calibration: We tested incrementally, first using hard-coded
-  maximum and minimum observed values outputted from the IMU, and then
-  with values taken from a self-calibration in which the robot would
-  spin in a circle, and the PIC would record the largest and smallest
-  values it saw on the X- and Y-axes.
-\end{itemize}
-
-\paragraph{Servos}
-
-We tested the functionality of servo code by testing individual
-functionality on both the hardware and software side. We tested the
-servo code in stages, first implementing control at a fixed speed and
-then implementing directional motion and lastly turning. This allowed us
-to verify our parts of the code and the functionality of the servos.
-
-\paragraph{Whole system}
-
-\begin{itemize}
-\tightlist
-\item
-  Some subsystem testing was required for the servo with the IMUs, for
-  turning/driving straight with feedback. We debugged by reading in IMU
-  values via UART and observing the robot's turns.
-\item
-  We tested extensively with the beacon and two hunters in different
-  environments. Most of our initial testing was in a large, open space
-  with a few metal tables on the periphery. We later tested in the lab
-  in the Digital Lab (Phillips 238), and in the hallway where our demo
-  took place. The confined space of the inside of the lab and hallway,
-  as well as the presence of more reflective bodies (metal doors,
-  tables, people) negatively impacted the performance of our hunters,
-  and it was necessary to recalibrate the hunters to work better in the
-  demo environment.
-\end{itemize}
+The purpose of the compensating algorithm was to allow the robots to recover faster after taking a wrong turn: if it just just moved forward and detected a
+weakened signal, turned, and still detected a weaker signal, then it must have turned the wrong way, so it does a 180. However, it did not prove much more accurate than randomized gradient descent, largely due to noisy readings from IMU and Bluetooth signal strength. As such, we used the simplified version.
 
 \subsection{Results}
 
@@ -668,9 +454,35 @@ by taking 2 Bluetooth modules, and measuring the RSSI while changing the
 distance between them. One remained stationary on the floor and the
 other was moved away from it 1 floor tile (each floor tile is a 1 foot
 square) at a time. At each point, we took 3 RSSI measurements and
-averaged them. The graph below displays the results:
+averaged them. Figure \ref{fig:rssiplot} shows the results (the original data is in table \ref{table:rssidata}).
 
-\includegraphics{rssi-chart.png}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\textwidth]{rssi-chart.png}
+  \caption{Plot showing bluetooth RSSI as a function of distance}
+  \label{fig:rssiplot}
+\end{figure}
+
+\begin{table}
+  \centering
+  \begin{tabular}[]{@{}llllll@{}}
+  \toprule
+  Distance (feet) & RSSI A & RSSI B & RSSI C & RSSI Average & Expected
+  RSSI \\
+  \midrule
+  1 & -48 & -48 & -48 & -48.00 & -48.00 \\
+  2 & -56 & -58 & -52 & -55.33 & -57.03 \\
+  3 & -66 & -66 & -68 & -66.67 & -62.31 \\
+  4 & -64 & -68 & -65 & -65.67 & -66.06 \\
+  5 & -60 & -70 & -64 & -64.67 & -68.97 \\
+  6 & -80 & -80 & -76 & -78.67 & -71.34 \\
+  7 & -80 & -79 & -65 & -74.67 & -73.35 \\
+  8 & -68 & -66 & -72 & -68.67 & -75.09 \\
+  \bottomrule
+  \end{tabular}
+  \caption{RSSI and distance data}
+  \label{table:rssidata}
+\end{table}
 
 While the chip reported RSSI in units proportional to dBm, and we
 measured distances in feet, not meters, we could still use the above
@@ -681,8 +493,7 @@ with \(A=-48\) and \(n=3\), resulting in the blue curve above. While the
 general shape of the curve matches, there is significant noise in the
 averaged RSSI data. Furthermore, when we tried to reproduce the
 measurements, we could not do so precisely -- it seemed to even depend
-on where our feet where! See \protect\hyperlink{rssi-data}{Appendix B}
-for the source data for the table.
+on where our feet where!
 
 Despite how noisy the RSSI measurements where, the robots were still
 able to perform a reasonably accurate gradient descent. In most cases,
@@ -691,29 +502,17 @@ minutes.
 
 \subsection{Conclusions}
 
-This assignment was an interesting exploration into short-range distance
-determination using Bluetooth, a generally unconventional approach. We
-were warned beforehand about the difficulties in using Bluetooth RSSI, a
-measurement particularly susceptible to multipath interference, as a
-distance sensor -- both in the papers and reference materials researched
-before implementation, as well as by course staff in the early stages of
-our project. We worked with the course staff to simplify and stratify
-our project into workable milestones. Our final project is a reduced
-version of our original plan.
-
-Our hunting bots worked reliably when they stayed within roughly 1 m of
-the beacon. After this, they entered the land of shallow gradients: the
-signal strength from the beacon (already noisy) would not change very
-much, and often only due to noise. The hunting bots normally could never
-recover from this. Our bots also worked better in larger, more open
-spaces, preferably without metal structures like tables or doors nearby.
-Both of these are reasonable given the operating range of BLE 4.0.
+This project was an interesting exploration into short-range distance
+determination using Bluetooth, a generally unconventional approach.
+We knew that Bluetooth RSSI would be noisy, mostly due to multipath interference.
+The robots worked reliably when they stayed within roughly 1 meter of the beacon.
+After this, they entered the land of shallow gradients:
+the signal strength from the beacon (already noisy) would not change very
+much, and often only due to noise.
+They normally could never recover from this.
 
 There are many potential avenues for improvements or further
-development. In addition to more circumstantial difficulties encountered
-during the project work period (such as extremely unbalanced servos,
-where one always ran faster than the other), two areas of potential
-improvement are as follows:
+development:
 
 \begin{itemize}
 \tightlist
@@ -726,41 +525,14 @@ improvement are as follows:
   that is approaching, or already at, the beacon can provide a second
   point of reference for a currently hunting robot.
 \item
-  \emph{More complete usage of IMU}. A lot of development time was spent
-  simply on getting the PIC to compass communication running, and not
-  much time was spent on calibrating the sensor or processing the data.
-  In further stages of this project, we could continue to work towards
-  dead reckoning of the mobile robots. This, paired with inter-swarm
+  \emph{More complete usage of IMU}. Additional usage of the accelerometer and gyroscope, coupled with feedback from the servos, would allow the robots to maintain a dead-reckoning position estimate. This, paired with inter-swarm
   communication, would make for a much more sophisticated and likely
   much more efficient system. (Of course, this does not resolve the
   shallow gradients problem -- but it would allow the approach to the
   beacon to be much faster.)
 \end{itemize}
 
-
-\subsubsection{Appendix A: Data}
-
-\hypertarget{rssi-data}{%
-\paragraph{RSSI data}\label{rssi-data}}
-
-\begin{longtable}[]{@{}llllll@{}}
-\toprule
-Distance (feet) & RSSI A & RSSI B & RSSI C & RSSI Average & Expected
-RSSI\tabularnewline
-\midrule
-\endhead
-1 & -48 & -48 & -48 & -48.00 & -48.00\tabularnewline
-2 & -56 & -58 & -52 & -55.33 & -57.03\tabularnewline
-3 & -66 & -66 & -68 & -66.67 & -62.31\tabularnewline
-4 & -64 & -68 & -65 & -65.67 & -66.06\tabularnewline
-5 & -60 & -70 & -64 & -64.67 & -68.97\tabularnewline
-6 & -80 & -80 & -76 & -78.67 & -71.34\tabularnewline
-7 & -80 & -79 & -65 & -74.67 & -73.35\tabularnewline
-8 & -68 & -66 & -72 & -68.67 & -75.09\tabularnewline
-\bottomrule
-\end{longtable}
-
-\subsubsection{Appendix B: Bill Of Materials}
+\subsubsection{Appendix A: Bill Of Materials}
 
 This project was done with a \$150 budget in mind. Costs for parts labeled ``Lab rental'' were borrowed from the department of Electrical and Computer Engineering at Cornell University, but can also be found at vendors like Digikey, Adafruit, and Amazon.
 
