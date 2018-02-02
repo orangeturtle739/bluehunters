@@ -24,10 +24,11 @@
 }
 \usepackage{hyperref}
 \hypersetup{
-            pdftitle={Blue Hunters: Bluetooth RSSI Locator Robots},
-            pdfauthor={Jacob Glueck (jng55); Jane Du (zd53); Justin Cray (jgc232)},
-            pdfborder={0 0 0},
-            breaklinks=true}
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
 \urlstyle{same}  % don't use monospace font for urls
 \usepackage{color}
 \usepackage{fancyvrb}
@@ -72,6 +73,8 @@
 \IfFileExists{footnote.sty}{\usepackage{footnote}\makesavenoteenv{longtable}}{}
 \usepackage{graphicx,grffile}
 \graphicspath{{../assets/}{../renderings/}}
+\usepackage{subfig}
+\usepackage{float}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
 \def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
@@ -94,15 +97,7 @@
 \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
 \fi
 
-% set default figure placement to htbp
-\makeatletter
-\def\fps@figure{htbp}
-\makeatother
-
-
 \title{Blue Hunters: Bluetooth RSSI Locator Robots}
-\providecommand{\subtitle}[1]{}
-\subtitle{\emph{ECE 4760, Fall 2017}}
 \author{Jacob Glueck (\href{mailto:jng55@cornell.edu}{jng55}) \and Jane Du (\href{mailto:zd53@cornell.edu}{zd53}) \and Justin Cray (\href{mailto:jgc232@cornell.edu}{jgc232})}
 \date{December 6, 2017}
 
@@ -112,122 +107,116 @@
 \hypertarget{introduction}{%
 \subsection{Introduction}\label{introduction}}
 
-Position estimation and navigation for robots is an interesting problem
-in the field of robotics. We investigate the challenge of determining
-relative position using signal strength; by placing a moving robot on
-the same plane as a beacon, oriented and positioned randomly, the
-robot can hunt out and move towards the beacon by itself. We discuss
-our procedures and challenges we encountered in this article.
+Position estimation and navigation for indoor robots is an interesting problem.
+In this article, we investigate using the Received Signal Strength Indicator (RSSI) of Bluetooth Low Energy (BLE) 4.0 chips to allow wheeled mobile robots to navigate towards a stationary base station.
+Each robot was controlled by a PIC32MX250 microcontroller, and used a 3 axis magnetometer as as compass in order to reliably turn, as well as 2 micro 9 g servos to drive.
+Each unit was powered with 3 AA batteries.
+Finally, the chassis and wheels of each car were 3D printed.
+Figure \ref{fig:robotsystem} shows the entire system.
 
-Specifically, we built 2 small cars which used Bluetooth Received Signal Strength
-Indicator (RSSI) measurements to navigate towards a stationary base
-station. The cars and base station used a Bluetooth Low Energy (BLE) 4.0
-module to take the measurements and a PIC32MX250 microcontroller. The
-cars also used a 3 axis magnetometer as as compass in order to reliably
-turn, as well as 2 micro 9 g servos to drive. Each unit was powered with
-3 AA batteries. Finally, the chassis and wheels of each car were 3D
-printed.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{full_system.jpg}
+  \caption{Full system with 2 robots and the base station}
+  \label{fig:robotsystem}
+\end{figure}
 
 \hypertarget{design}{%
 \subsection{Design}\label{design}}
-
-The design of the project can be split into 3 main parts: the chassis, the electronics (hardware), and the software. The following sections discuss implementation details.
 
 \hypertarget{chassis}{%
 \subsubsection{Chassis}\label{chassis}}
 
 The robots are made from 4 3D printed pieces: 2 wheels, the frame, and
-the caster in the back. The servos, a 3 AA battery holder, and a
-perfboard containing all the circuitry are mounted directly to the
-frame.
-
-The robots where designed in \href{http://www.openscad.org/}{OpenSCAD},
-and their source code is available in
-\href{https://github.com/orangeturtle739/bluehunters/tree/master/cad}{our
-git repository} and
-\protect\hyperlink{appendix-b-source-listing}{below}. There are three
-files, \href{generated/frame.scad.html}{\texttt{frame.scad}},
-\href{generated/drag.scad.html}{\texttt{drag.scad}}, and
-\href{generated/wheel.scad.html}{\texttt{wheel.scad}}, for each of the
-three parts. The main modules are defined in
-\href{generated/main.scad.html}{\texttt{main.scad}}, and the other files
-just instantiate them. The following renderings show each part:
+the caster in the back.
+Figure \ref{fig:robotchassis} shows the main components.
+The servos, a 3 AA battery holder, and a perfboard containing all the circuitry are mounted directly to the frame.
 
 \begin{figure}
-\centering
-\includegraphics[width=0.5\textwidth,height=\textheight]{frame.png}
-\caption{Robot chassis}
+  \centering
+  \subfloat[Frame] {
+    \includegraphics[width=0.5\textwidth,height=\textheight]{frame.png}
+    \label{fig:robotfrane}
+  }
+  \subfloat[Wheel]{
+    \includegraphics[width=0.5\textwidth,height=\textheight]{wheel.png}
+    \label{fig:robotwheel}
+  }
+  \\
+  \subfloat[Caster]{
+    \includegraphics[width=0.5\textwidth,height=\textheight]{drag.png}
+    \label{fig:robotcaster}
+  }
+  \caption{Components of robot chassis}
+  \label{fig:robotchassis}
 \end{figure}
+
+The parts were printed in ABS using Maker Select 3D Printer v2 printers.
+All parts were printed with a layer height of 0.3 mm, as there was no need for a smooth finish or high tolerances.
+The parts where sliced with Cura.
 
 \begin{figure}
-\centering
-\includegraphics[width=0.5\textwidth,height=\textheight]{drag.png}
-\caption{Caster wheel on back of robot}
+  \centering
+  \subfloat[Top view]{
+    \includegraphics[width=0.5\textwidth]{top_view.jpg}
+    \label{fig:robottop}
+  }
+  \subfloat[Side view]{
+    \includegraphics[width=0.5\textwidth]{side_view.jpg}
+    \label{fig:robotside}
+  }
+  \\
+  \subfloat[Front view]{
+    \includegraphics[width=0.5\textwidth]{front_view.jpg}
+    \label{fig:robotfront}
+  }
+  \subfloat[Back view]{
+    \includegraphics[width=0.5\textwidth]{inside_view.jpg}
+    \label{fig:robotback}
+  }
+  \caption{Multiple views of the completed robots}
+  \label{fig:robotviews}
 \end{figure}
-
-\begin{figure}
-\centering
-\includegraphics[width=0.5\textwidth,height=\textheight]{wheel.png}
-\caption{Robot wheel}
-\end{figure}
-
-The parts were printed in ABS using
-\href{https://www.monoprice.com/product?c_id=107\&cp_id=10724\&cs_id=1072403\&p_id=13860\&seq=1\&format=2}{Maker
-Select 3D Printer v2} printers. All parts were printed with a layer
-height of 0.3 mm, as there was no need for a smooth finish or high
-tolerances. The parts where sliced with
-\href{https://ultimaker.com/en/products/ultimaker-cura-software}{Cura}.
-
-\hypertarget{pictures}{%
-\subsubsection{Pictures}\label{pictures}}
-
-Full system (base station and 2 robots):
-
-\includegraphics[width=0.5\textwidth,height=\textheight]{full_system.jpg}
-
-Multiple views of the robots:
-
-\begin{longtable}[]{@{}ll@{}}
-\toprule
-\includegraphics{top_view.jpg} &
-\includegraphics{side_view.jpg}\tabularnewline
-\includegraphics{front_view.jpg} &
-\includegraphics{inside_view.jpg}\tabularnewline
-\bottomrule
-\end{longtable}
 
 \hypertarget{electronics}{%
 \subsubsection{Electronics}\label{electronics}}
 
-\hypertarget{bluetooth-modules}{%
-\paragraph{Bluetooth modules}\label{bluetooth-modules}}
+Each robot consisted of 4 main components:
+\begin{enumerate}
+  \item PIC32MC250F128B microcontroller.
+  \item MPU-9250 IMU with a 3 axis gryoscope, accelerometer, and magnetometer.
+  \item HM-10 BLE module with a Texas Instruments CC2541 chip.
+  \item Two 9 gram FS90R micro continuous rotation servos.
+\end{enumerate}
 
-The HM-10 bluetooth modules we bought off Ebay were fakes: they were not
-made by Jnhuamao \footnote{Jnhuamao is the company which makes the HM-10
-  module, along with other Bluetooth modules. Their English website is:
-  \url{http://www.jnhuamao.cn/bluetooth.asp?id=1}.}, and did not come
-with genuine Jnhuamao firmware. However, they did have real TI CC2541
-chips. We realized they were fakes when they did not behave according to
-the Jnhuamao data sheet. \footnote{The original data sheet comes from \cite{jnhuamaodatasheet}. A PDF is available at \cite{jnhuamaomit}, which may be out of date, but is eaiser to get.}
-Luckily, the hardware on the fake chips is the same as
-that of the genuine chips, minus an external crystal, and the genuine
-firmware checks for the presence of the crystal, and works even without
+The components are connected as shown in figure \ref{fig:schematic}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\textwidth]{schematic.png}
+  \caption{Schematic}
+  \label{fig:schematic}
+\end{figure}
+
+\paragraph{Bluetooth modules}
+
+The HM-10 bluetooth modules we bought off Ebay were fakes: they were not made by Jnhuamao,
+\footnote{Jnhuamao is the company which makes the HM-10 module, along with other Bluetooth modules. Their English website is: \url{http://www.jnhuamao.cn/bluetooth.asp?id=1}.}
+and did not come with genuine Jnhuamao firmware.
+However, they did have genuine TI CC2541 chips.
+We realized they were fakes when they did not behave according to
+the Jnhuamao data sheet.
+\footnote{The original data sheet comes from \cite{jnhuamaodatasheet}.
+A PDF is available at \cite{jnhuamaomit}, which may be out of date, but is eaiser to get.}
+Luckily, the hardware on the fake chips is the same as that of the genuine chips, minus an external crystal, and the genuine firmware checks for the presence of the crystal, and works even without
 it. \cite{crystal}
 As such, we reprogrammed the chips with the genuine firmware according
-to an
-\href{http://forum.arduino.cc/index.php?topic=393655.msg2709528\#msg2709528}{Arduino
-forum post}  \cite{crystal}:
+to an Arduino \cite{crystal}:
 
 \begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
 \item
-  We soldered wires to the programming pins on the breakout boards, and
-  connected those pins to an
-  \href{https://www.pjrc.com/teensy/teensy31.html}{Arduino Teensy 3.2}.
-  We chose a Teensy because it is 3.3 V as opposed to 5, which would
-  damage the 3.3 V CC2541.
-
-  The pins were connected as follows:
+  We soldered wires to the programming pins on the breakout boards, and connected those pins to an Arduino Teensy 3.2.
+  We chose a Teensy because it is 3.3 volts as opposed to 5, which would damage the 3.3 volt CC2541. The pins were connected as follows:
 
   \begin{longtable}[]{@{}lll@{}}
   \toprule
@@ -240,42 +229,33 @@ forum post}  \cite{crystal}:
   \bottomrule
   \end{longtable}
 
-  The layout of the HM-10 board is:
+  Figure \ref{fig:hm10} shows the layout of the HM-10 module.
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.3\textwidth]{hm10_pins.png}
+    \caption{HM-10 module pin layout \cite{crystal}}
+    \label{fig:hm10}
+  \end{figure}
 
-  \includegraphics{hm10_pins.png}
 \item
-  We uploaded the
-  \href{https://github.com/RedBearLab/CCLoader/blob/master/Arduino/CCLoader/CCLoader.ino}{\texttt{CCLoader.ino}
-  sketch} to the Arduino.
+  We uploaded the \texttt{CCLoader.ino} \cite{ccloader} sketch to the Arduino.
 \item
-  Finally, we ran (in a Windows virtual machine)
-  \href{https://github.com/RedBearLab/CCLoader/tree/master/Windows}{\texttt{CCLoader.exe}}.
+  Finally, we ran (in a Windows virtual machine, due to the dubious origin of the software) \texttt{CCLoader.exe} \cite{ccloaderexe}.
   This program takes 3 arguments:
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{CCLoader.exe} \OperatorTok{<}\NormalTok{COM Port}\OperatorTok{>} \OperatorTok{<}\NormalTok{Firmware.bin}\OperatorTok{>}\NormalTok{ 0}
-\end{Highlighting}
-\end{Shaded}
+  \begin{Verbatim}[gobble=4]
+    CCLoader.exe <COM Port> <Firmware.bin> 0
+  \end{Verbatim}
 
-  The firmware file came from the same Arduino form post, and can be
-  found
-  \href{http://forum.arduino.cc/index.php?action=dlattach;topic=393655.0;attach=183702}{here}.
+  The firmware file came from the Arduino forum post \cite{crystal}, and can be
+  found at \url{http://forum.arduino.cc/index.php?action=dlattach;topic=393655.0;attach=183702}.
 \end{enumerate}
 
-There is also an excellent
-\href{https://www.youtube.com/watch?v=ez3491-v8Og}{YouTube video}, which
-explains the firmware flashing process.
-
-After flashing genuine firmware onto the chip, the next step was to
-update the firmware to the latest version. The firmware flashed onto the
-board was version 540, but Jnhuamao had (at the time we did this
-project) released
-version 603. \cite{jnhuamao603} Based on their instructions \cite{jnhuamaoinstructions}, we flashed our chips:
+After flashing genuine firmware onto the chip, the next step was to update the firmware to the latest version.
+The firmware flashed onto the board was version 540, but Jnhuamao had (at the time we did this project) released version 603. \cite{jnhuamao603}
+Based on their instructions \cite{jnhuamaoinstructions}, we flashed our chips:
 
 \begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
 \item
   Connect the HM-10 module to a computer using a 3.3 V FTDI to USB
   adapter. Then, use PUTTY to establish a serial session (9600 baud,
@@ -297,8 +277,7 @@ version 603. \cite{jnhuamao603} Based on their instructions \cite{jnhuamaoinstru
   information.
 \end{enumerate}
 
-\hypertarget{software}{%
-\subsubsection{Software}\label{software}}
+\subsubsection{Software}
 
 The robots were programmed in C, using the
 \href{http://www.microchip.com/mplab/mplab-x-ide}{MPLAB X IDE} v4.0,
@@ -335,8 +314,7 @@ divided into 5 main units:
   protothreads definitions to a separate file resolved this issue.
 \end{itemize}
 
-\hypertarget{ble}{%
-\paragraph{BLE}\label{ble}}
+\paragraph{BLE}
 
 The BLE module used UART, at 9600 baud 8N1. We used \texttt{UART1} on
 the PIC for communicating with the BLE module, and used \texttt{UART2}
@@ -411,8 +389,7 @@ One interesting thing to note about the chip is that commands do not
 have to end with newlines or carriage returns. However, if sent, the
 chip will ignore them.
 
-\hypertarget{imu}{%
-\paragraph{IMU}\label{imu}}
+\paragraph{IMU}
 
 The PIC commmunicates with the IMU via I2C. The IMU includes a breakout
 board for the QFN MPU-9250 \cite{mpu9250datasheet} \cite{mpu9250regmap} module, which itself includes 2 dies. One
@@ -521,8 +498,7 @@ In order to calibrate the compass, the robots spun in place when powered
 on. They recorded the maximum and minimum values for each axes, and used
 that data to scale and center the magnetometer readings.
 
-\hypertarget{servos}{%
-\paragraph{Servos}\label{servos}}
+\paragraph{Servos}
 
 For the drive systems, we used the FS90R servos. These servos are
 continuous rotation servos with a stall torque of 1.5 kg-cm. Continuous
@@ -541,8 +517,7 @@ to control the system where both wheels are driven forward or point
 turns where one wheel is turned in one direction and one is turned in
 the other direction.
 
-\hypertarget{protothreads}{%
-\paragraph{Protothreads}\label{protothreads}}
+\paragraph{Protothreads}
 
 While the provided protothreads library was very helpful, it did not
 work correctly when used in multiple compilation units. The reason for
@@ -581,8 +556,7 @@ The fix to this was twofold:
 The updated versions of protothreads can be found in
 \protect\hyperlink{appendix-b-source-listing}{Appendix B}.
 
-\hypertarget{gradient-descent}{%
-\paragraph{Gradient descent}\label{gradient-descent}}
+\paragraph{Gradient descent}
 
 The algorithm for deciding what path to follow is a basic version of
 gradient descent. The following image represents the decision-making
@@ -604,11 +578,9 @@ It did not prove much more accurate than randomized gradient descent,
 largely due to noisy readings from IMU and Bluetooth signal strength. As
 such, we used the simplified version.
 
-\hypertarget{testing}{%
-\subsubsection{Testing}\label{testing}}
+\subsubsection{Testing}
 
-\hypertarget{ble-1}{%
-\paragraph{BLE}\label{ble-1}}
+\paragraph{BLE}
 
 Once we flashed the Bluetooth chips with the proper firmware, we used
 the
@@ -624,8 +596,7 @@ We also experimented with RSSI, as described in
 effectiveness of RSSI as an approximate metric for distance measurement,
 though confirmed that it would be highly variable.
 
-\hypertarget{imu-1}{%
-\paragraph{IMU}\label{imu-1}}
+\paragraph{IMU}
 
 \begin{itemize}
 \tightlist
@@ -651,8 +622,7 @@ though confirmed that it would be highly variable.
   values it saw on the X- and Y-axes.
 \end{itemize}
 
-\hypertarget{servos-1}{%
-\paragraph{Servos}\label{servos-1}}
+\paragraph{Servos}
 
 We tested the functionality of servo code by testing individual
 functionality on both the hardware and software side. We tested the
@@ -660,8 +630,7 @@ servo code in stages, first implementing control at a fixed speed and
 then implementing directional motion and lastly turning. This allowed us
 to verify our parts of the code and the functionality of the servos.
 
-\hypertarget{whole-system}{%
-\paragraph{Whole system}\label{whole-system}}
+\paragraph{Whole system}
 
 \begin{itemize}
 \tightlist
@@ -681,8 +650,7 @@ to verify our parts of the code and the functionality of the servos.
   demo environment.
 \end{itemize}
 
-\hypertarget{results}{%
-\subsection{Results}\label{results}}
+\subsection{Results}
 
 In most cases, at least 1 of the 2 robots successfully made it to the
 base station. However, it was not as reliable as we initially hoped. One
@@ -721,8 +689,7 @@ able to perform a reasonably accurate gradient descent. In most cases,
 at least one of the 2 robots would find the beacon in a matter of
 minutes.
 
-\hypertarget{conclusions}{%
-\subsection{Conclusions}\label{conclusions}}
+\subsection{Conclusions}
 
 This assignment was an interesting exploration into short-range distance
 determination using Bluetooth, a generally unconventional approach. We
@@ -770,11 +737,8 @@ improvement are as follows:
   beacon to be much faster.)
 \end{itemize}
 
-\hypertarget{appendices}{%
-\subsection{Appendices}\label{appendices}}
 
-\hypertarget{appendix-c-schematics}{%
-\subsubsection{Appendix A: Data}\label{appendix-c-schematics}}
+\subsubsection{Appendix A: Data}
 
 \hypertarget{rssi-data}{%
 \paragraph{RSSI data}\label{rssi-data}}
@@ -796,16 +760,9 @@ RSSI\tabularnewline
 \bottomrule
 \end{longtable}
 
-\hypertarget{appendix-c-schematics}{%
-\subsubsection{Appendix B: Schematics}\label{appendix-c-schematics}}
+\subsubsection{Appendix B: Bill Of Materials}
 
-\includegraphics{schematic.png}
-
-\hypertarget{appendix-d-bill-of-materials}{%
-\subsubsection{Appendix D: Bill Of
-Materials}\label{appendix-d-bill-of-materials}}
-
-This project was done with a \$150 budget in mind. Costs for parts labelled ``Lab rental'' were borrowed from the department of Electrical and Computer Engineering at Cornell University, but can also be found at vendors like Digikey, Adafruit, and Amazon.
+This project was done with a \$150 budget in mind. Costs for parts labeled ``Lab rental'' were borrowed from the department of Electrical and Computer Engineering at Cornell University, but can also be found at vendors like Digikey, Adafruit, and Amazon.
 
 \begin{longtable}[]{@{}lllllll@{}}
 \toprule
