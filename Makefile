@@ -1,10 +1,13 @@
 SHELL := /bin/bash
 TEMPLATE = "https://raw.githubusercontent.com/tajmone/pandoc-goodies/2e29e9cd54bb9113c0b4fb474a07b8fcf6ee287b/templates/html5/github/GitHub.html5"
 .PHONY: clean
+.PHONY: articlepdf
+
+articlepdf: article/article.pdf
 
 report/report.html: README.md report/GitHub.html5 renderings/frame.png renderings/drag.png renderings/wheel.png report/generated report/stl | report
 	pandoc README.md --template report/GitHub.html5 --resource-path=assets:renderings --self-contained --toc --toc-depth 4 -r markdown+yaml_metadata_block+footnotes+pipe_tables -t html -s -o report/report.html
-article/article.pdf: renderings/frame.png renderings/drag.png renderings/wheel.png report/generated report/stl article/article.tex | article
+article/article.pdf: renderings/frame.png renderings/drag.png renderings/wheel.png report/generated report/stl article/references.bib article/article.tex | article
 	cd article && latexmk -pdf article.tex
 report/GitHub.html5: | report
 	rm -f report/GitHub.html5 && wget $(TEMPLATE) -O report/GitHub.html5

@@ -208,15 +208,15 @@ made by Jnhuamao \footnote{Jnhuamao is the company which makes the HM-10
   \url{http://www.jnhuamao.cn/bluetooth.asp?id=1}.}, and did not come
 with genuine Jnhuamao firmware. However, they did have real TI CC2541
 chips. We realized they were fakes when they did not behave according to
-the Jnhuamao data sheet (see \protect\hyperlink{data-sheets}{the data
-sheets section}). Luckily, the hardware on the fake chips is the same as
+the Jnhuamao data sheet. \footnote{The original data sheet comes from \cite{jnhuamaodatasheet}. A PDF is available at \cite{jnhuamaomit}, which may be out of date, but is eaiser to get.}
+Luckily, the hardware on the fake chips is the same as
 that of the genuine chips, minus an external crystal, and the genuine
 firmware checks for the presence of the crystal, and works even without
-it. \footnote{\url{http://forum.arduino.cc/index.php?topic=393655.msg2709528\#msg2709528}.}
+it. \cite{crystal}
 As such, we reprogrammed the chips with the genuine firmware according
 to an
 \href{http://forum.arduino.cc/index.php?topic=393655.msg2709528\#msg2709528}{Arduino
-forum post}:
+forum post}  \cite{crystal}:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -270,13 +270,8 @@ explains the firmware flashing process.
 After flashing genuine firmware onto the chip, the next step was to
 update the firmware to the latest version. The firmware flashed onto the
 board was version 540, but Jnhuamao had (at the time we did this
-project)
-\href{http://www.jnhuamao.cn/rom/HMSoft-10-2541-V603.zip}{released
-version 603}. \footnote{Jnhuamao's firmware download page
-  \url{http://www.jnhuamao.cn/download_rom_en.asp?id=1\#}.} They also
-provide
-\href{http://www.jnhuamao.cn/HowToUpgradeFirmware_en.zip}{instructions
-on how to upgrade the firmware}. The basic process is:
+project) released
+version 603. \cite{jnhuamao603} Based on their instructions \cite{jnhuamaoinstructions}, we flashed our chips:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -401,7 +396,8 @@ functions. The commands it sends to the chip are:
   scan. The result of the scan is a bunch of lines of the form:
 
 \begin{verbatim}
-OK+DISC:00000000:00000000000000000000000000000000:0000000000:6832A3801EBE:-080
+OK+DISC:00000000:00000000000000000000000000000000:
+  0000000000:6832A3801EBE:-080
 \end{verbatim}
 
   The second to last token, \texttt{6832A3801EBE}, is the hardware
@@ -422,7 +418,7 @@ The PIC commmunicates with the IMU via I2C. The IMU includes a breakout
 board for the QFN MPU-9250 \cite{mpu9250datasheet} \cite{mpu9250regmap} module, which itself includes 2 dies. One
 contains the 3-axis gyroscope and 3-axis accelerometer, which were not
 used in this project, and the other die is the AK8963 3-axis
-magnetometer (compass).
+magnetometer (compass). \cite{ak8963cdatasheet}
 
 It is connected to the rest of the MPU module via an auxillary I2C bus,
 so it is not connected to the MPU's main I2C bus by default. While the
@@ -458,6 +454,8 @@ Some useful functions as defined in
 
 Initializing the IMU involves opening the I2C module, and then
 configuring the IMU.
+
+We based our IMU code off of the \texttt{i2c\_helper.h} from the Self-Balancing Robot project. \cite{selfbalancingrobot}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -696,16 +694,7 @@ following relation:
 \(\text{RSSI} = A - 10 n \log(d)\)
 
 where \(A\) and \(n\) are RF propagation parameters in dBm, \(d\) is
-distance in meters, and RSSI is the measured RSSI in dBm. \footnote{L.
-  Peneda, A. Azenha and A. Carvalho, ``Trilateration for indoors
-  positioning within the framework of wireless communications,'' 2009
-  35th Annual Conference of IEEE Industrial Electronics, Porto, 2009,
-  pp.~2732-2737.
-
-  doi: 10.1109/IECON.2009.5415423
-
-  URL:
-  \url{http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=\&arnumber=5415423\&isnumber=5414636}}
+distance in meters, and RSSI is the measured RSSI in dBm. \cite{5415423}
 We experimented with RSSI measurements to determine how well they worked
 by taking 2 Bluetooth modules, and measuring the RSSI while changing the
 distance between them. One remained stationary on the floor and the
@@ -752,23 +741,6 @@ much, and often only due to noise. The hunting bots normally could never
 recover from this. Our bots also worked better in larger, more open
 spaces, preferably without metal structures like tables or doors nearby.
 Both of these are reasonable given the operating range of BLE 4.0.
-
-We reused some of the code from the
-\href{https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/index.html}{Self-Balancing
-Robot} as
-\protect\hyperlink{code-and-designs-borrowed-from-others}{cited} in our
-references section, and explained in \protect\hyperlink{imu}{IMU}. The
-rest of the design is ours, and is not an infringement on intellectual
-property. We also used the Bluetooth firmware flashing technique we
-discovered on the
-\href{http://forum.arduino.cc/index.php?topic=393655.msg2709528\#msg2709528}{Arduino
-forums}.
-
-We did not reverse-engineer any technology, and did not encounter any
-issues with trademarks or patents. We did not have to sign
-non-disclosure to get a sample part. We hope to further polish our
-findings and report, and will aim to publish them in a print magazine,
-ideally as a part of ECE 4920.
 
 There are many potential avenues for improvements or further
 development. In addition to more circumstantial difficulties encountered
@@ -961,55 +933,6 @@ Lab\strut
 \end{longtable}
 
 \textbf{Total:} \$97.68
-
-\hypertarget{references}{%
-\subsubsection{References}\label{references}}
-
-\hypertarget{data-sheets}{%
-\paragraph{Data sheets}\label{data-sheets}}
-
-\begin{itemize}
-\tightlist
-\item
-  \href{https://www.akm.com/akm/en/file/datasheet/AK8963C.pdf}{3-axis
-  Electronic Compass on IMU}.
-\item
-  \href{http://www.jnhuamao.cn/bluetooth40_en.zip}{HM-10 (Bluetooth
-  breakout module \& firmware)}. The ZIP contains the original data
-  sheet, as well as other documentation.
-  \href{http://fab.cba.mit.edu/classes/863.15/doc/tutorials/programming/bluetooth/bluetooth40_en.pdf}{MIT
-  has a PDF} available, which may me out of date, but is easier to get
-  to.
-\item
-  \href{http://ww1.microchip.com/downloads/en/DeviceDoc/60001168J.pdf}{PIC32MX250}.
-\end{itemize}
-
-\hypertarget{code-and-designs-borrowed-from-others}{%
-\paragraph{Code and designs borrowed from
-others}\label{code-and-designs-borrowed-from-others}}
-
-\begin{itemize}
-\tightlist
-\item
-  \href{https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/index.html}{Self-Balancing
-  Robot} by Desmond Caulley (dc686@cornell.edu), Nadav Nehoran
-  (nn233@cornell.edu), Sherry Zhao (hz263@cornell.edu). In particular,
-  we borrowed extensively from their
-  \href{https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/dc686_nn233_hz263/i2c_helper.h}{i2c\_helper.h}.
-\end{itemize}
-
-\hypertarget{other}{%
-\paragraph{Other}\label{other}}
-
-\begin{itemize}
-\tightlist
-\item
-  \href{http://people.ece.cornell.edu/land/courses/ece4760/}{ECE 4760
-  Website} by Bruce Land
-\item
-  Website template:
-  \url{https://github.com/tajmone/pandoc-goodies/tree/master/templates/html5/github}.
-\end{itemize}
 
 \bibliography{references}{}
 \bibliographystyle{ieeetr}
