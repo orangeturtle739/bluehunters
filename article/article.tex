@@ -72,7 +72,7 @@
 % Fix footnotes in tables (requires footnote package)
 \IfFileExists{footnote.sty}{\usepackage{footnote}\makesavenoteenv{longtable}}{}
 \usepackage{graphicx,grffile}
-\graphicspath{{../assets/}{../renderings/}}
+\graphicspath{{../assets/}{../renderings/}{../schematics/}}
 \usepackage{subfig}
 \usepackage{float}
 \makeatletter
@@ -193,7 +193,13 @@ The components are connected as shown in figure \ref{fig:schematic}.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.9\textwidth]{schematic.png}
+  \subfloat[] {
+    \includegraphics[width=0.9\textwidth]{bluehunters-robot.png}
+  }
+  \\
+  \subfloat[] {
+    \includegraphics[width=0.9\textwidth]{bluehunters-sdb.png}
+  }
   \caption{Schematic}
   \label{fig:schematic}
 \end{figure}
