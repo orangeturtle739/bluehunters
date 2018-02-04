@@ -75,6 +75,7 @@
 \graphicspath{{../assets/}{../renderings/}{../schematics/}}
 \usepackage{subfig}
 \usepackage{float}
+\usepackage[page]{appendix}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
 \def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
@@ -107,7 +108,6 @@
 \hypertarget{introduction}{%
 \subsection{Introduction}\label{introduction}}
 
-Position estimation and navigation for indoor robots is an interesting problem.
 In this article, we investigate using the Received Signal Strength Indicator (RSSI) of Bluetooth Low Energy (BLE) 4.0 chips to allow wheeled mobile robots to navigate towards a stationary base station.
 Each robot was controlled by a PIC32MX250 microcontroller, and used a 3 axis magnetometer as as compass in order to reliably turn, as well as 2 micro 9 g servos to drive.
 Each unit was powered with 3 AA batteries.
@@ -121,11 +121,9 @@ Figure \ref{fig:robotsystem} shows the entire system.
   \label{fig:robotsystem}
 \end{figure}
 
-\hypertarget{design}{%
-\subsection{Design}\label{design}}
+\subsection{Hardware}
 
-\hypertarget{chassis}{%
-\subsubsection{Chassis}\label{chassis}}
+\subsubsection{Chassis}
 
 The robots are made from 4 3D printed pieces: 2 wheels, the frame, and
 the caster in the back.
@@ -135,16 +133,16 @@ The servos, a 3 AA battery holder, and a perfboard containing all the circuitry 
 \begin{figure}
   \centering
   \subfloat[Frame] {
-    \includegraphics[width=0.5\textwidth,height=\textheight]{frame.png}
+    \includegraphics[width=0.4\textwidth,height=\textheight]{frame.png}
     \label{fig:robotfrane}
   }
   \subfloat[Wheel]{
-    \includegraphics[width=0.5\textwidth,height=\textheight]{wheel.png}
+    \includegraphics[width=0.4\textwidth,height=\textheight]{wheel.png}
     \label{fig:robotwheel}
   }
   \\
   \subfloat[Caster]{
-    \includegraphics[width=0.5\textwidth,height=\textheight]{drag.png}
+    \includegraphics[width=0.4\textwidth,height=\textheight]{drag.png}
     \label{fig:robotcaster}
   }
   \caption{Components of robot chassis}
@@ -153,25 +151,25 @@ The servos, a 3 AA battery holder, and a perfboard containing all the circuitry 
 
 The parts were printed in ABS using Maker Select 3D Printer v2 printers.
 All parts were printed with a layer height of 0.3 mm, as there was no need for a smooth finish or high tolerances.
-The parts where sliced with Cura.
+The parts were designed in OpenSCAD, and sliced with Cura.
 
 \begin{figure}
   \centering
   \subfloat[Top view]{
-    \includegraphics[width=0.5\textwidth]{top_view.jpg}
+    \includegraphics[width=0.4\textwidth]{top_view.jpg}
     \label{fig:robottop}
   }
   \subfloat[Side view]{
-    \includegraphics[width=0.5\textwidth]{side_view.jpg}
+    \includegraphics[width=0.4\textwidth]{side_view.jpg}
     \label{fig:robotside}
   }
   \\
   \subfloat[Front view]{
-    \includegraphics[width=0.5\textwidth]{front_view.jpg}
+    \includegraphics[width=0.4\textwidth]{front_view.jpg}
     \label{fig:robotfront}
   }
   \subfloat[Back view]{
-    \includegraphics[width=0.5\textwidth]{inside_view.jpg}
+    \includegraphics[width=0.4\textwidth]{inside_view.jpg}
     \label{fig:robotback}
   }
   \caption{Multiple views of the completed robots}
@@ -189,16 +187,18 @@ Each robot consisted of 4 main components:
   \item Two 9 gram FS90R micro continuous rotation servos.
 \end{enumerate}
 
-The components are connected as shown in figure \ref{fig:schematic}.
+The PIC32 and supporting circuity was on a small PCB (the ``Small Dev Board'' from ECE 4760 at Cornell University, the class during which we built this) shown in figure \ref{fig:schematic-sdb}. The rest of the components were assembled on solderable breadboard as shown in figure \ref{fig:schematic-robot}.
 
 \begin{figure}
   \centering
   \subfloat[] {
     \includegraphics[width=0.9\textwidth]{bluehunters-robot.png}
+    \label{fig:schematic-robot}
   }
   \\
   \subfloat[] {
     \includegraphics[width=0.9\textwidth]{bluehunters-sdb.png}
+    \label{fig:schematic-sdb}
   }
   \caption{Schematic}
   \label{fig:schematic}
@@ -217,7 +217,7 @@ A PDF is available at \cite{jnhuamaomit}, which may be out of date, but is eaise
 Luckily, the hardware on the fake chips is the same as that of the genuine chips, minus an external crystal, and the genuine firmware checks for the presence of the crystal, and works even without
 it. \cite{crystal}
 As such, we reprogrammed the chips with the genuine firmware according
-to an Arduino \cite{crystal}:
+to an Arduino Fourm post \cite{crystal}:
 
 \begin{enumerate}
 \item
@@ -253,8 +253,7 @@ to an Arduino \cite{crystal}:
     CCLoader.exe <COM Port> <Firmware.bin> 0
   \end{Verbatim}
 
-  The firmware file came from the Arduino forum post \cite{crystal}, and can be
-  found at \url{http://forum.arduino.cc/index.php?action=dlattach;topic=393655.0;attach=183702}.
+  The firmware file came from the Arduino forum post. \footnote{The firmware file can be found here:  \url{http://forum.arduino.cc/index.php?action=dlattach;topic=393655.0;attach=183702}}
 \end{enumerate}
 
 After flashing genuine firmware onto the chip, the next step was to update the firmware to the latest version.
@@ -272,8 +271,7 @@ Based on their instructions \cite{jnhuamaoinstructions}, we flashed our chips:
   will respond with \texttt{OK+SBLUP}. Terminate the PUTTY session.
 \item
   Run the \texttt{HMSoft.exe} program distributed in the firmware update
-  download. We ran it in a Windows virtual machine because we did not
-  trust it.
+  download. (Again in a Windows virtual machine, due to the dubious origin of the software.)
 \item
   Select the proper port and firmware file using the software, and hit
   ``Load Image''. The software should handle the rest!
@@ -283,13 +281,13 @@ Based on their instructions \cite{jnhuamaoinstructions}, we flashed our chips:
   information.
 \end{enumerate}
 
-\subsubsection{Software}
+\subsection{Software}
 
 The robots were programmed in C, using MPLAB X IDE v4.0, the XC32 v1.4
-compiler and the PIC 32 Legacy Peripheral Library (plib).
-The full source code is available in online: \url{https://github.com/orangeturtle739/bluehunters/tree/master/ble.X}.
+compiler and the PIC 32 Legacy Peripheral Library (plib). \footnote{
+The full source code is available in online: \url{https://github.com/orangeturtle739/bluehunters/tree/master/ble.X}}
 
-\paragraph{BLE}
+\subsubsection{BLE}
 
 The BLE module used UART, at 9600 baud 8N1. We used \texttt{UART1} on
 the PIC for communicating with the BLE module, and used \texttt{UART2}
@@ -339,7 +337,7 @@ We used the following commands to interact with the bluetooth chip:
   the results are reported by hardware address.
 \item
   \texttt{AT+DISI?}: performed only on the robots, causing a discovery
-  scan. The result of the scan is a bunch of lines of the form:
+  scan. The result of the scan is a series of lines of the form:
 
 \begin{verbatim}
 OK+DISC:00000000:00000000000000000000000000000000:
@@ -353,35 +351,22 @@ OK+DISC:00000000:00000000000000000000000000000000:
   characters), followed by \texttt{OK+DISCE}.
 \end{itemize}
 
-One interesting thing to note about the chip is that commands do not
-have to end with newlines or carriage returns. However, if sent, the
-chip will ignore them.
+One interesting thing to note about the chip is that commands do not have to end with newlines or carriage returns.
+However, if sent, the chip will ignore them.
 
 \paragraph{IMU}
 
-The PIC communicates with the IMU via I2C.
-The IMU includes a breakout board for the QFN MPU-9250 \cite{mpu9250datasheet} \cite{mpu9250regmap} module, which itself includes 2 dies.
-One contains the 3-axis gyroscope and 3-axis accelerometer, which were not
+The PIC communicates with the IMU via I2C. The QFN MPU-9250 \cite{mpu9250datasheet} \cite{mpu9250regmap} module has 2 dies:
+one contains the 3-axis gyroscope and 3-axis accelerometer, which were not
 used in this project, and the other die is the AK8963 3-axis
 magnetometer (compass). \cite{ak8963cdatasheet}
 
-It is connected to the rest of the MPU module via an auxiliary I2C bus,
-so it is not connected to the MPU's main I2C bus by default. While the
-accelerometer and gyroscope registers can be read after powering up the
-IMU, the compass also needs pass-through mode to be enabled on the IMU
-to make it an accessible slave on the I2C bus. We based our IMU code off of the \texttt{i2c\_helper.h} from the Self-Balancing Robot project. \cite{selfbalancingrobot} The AK8963 has several modes
-of operation, and the chip must be set to power-down mode before
-switching to other modes. We read compass values with single measurement
-mode, as in figure \ref{fig:imu_single_measurement}.
+The compass is connected to the rest of the MPU module via an auxiliary I2C bus.
+In order to make the compass an accessible slave on the I2C bus, pass-through mode to be enabled on the IMU.
+\footnote{We based our IMU code off of another ECE 4760 project, the Self-Balancing Robot. \cite{selfbalancingrobot} Their \texttt{i2c\_helper.h} was very helpful.}
+The AK8963 has several modes of operation, and the chip must be set to power-down mode before switching to other modes.
+We read compass values with single measurement mode, as in figure \ref{fig:imu_single_measurement}:
 
-\begin{figure}
-  \centering
-  \includegraphics[width=0.9\textwidth]{imu_single_measurement.png}
-  \caption{IMU single measurement mode}
-  \label{fig:imu_single_measurement}
-\end{figure}
-
-In order to read the magnetometer, we:
 \begin{enumerate}
 \item
   Set the compass to single measurement mode in 14 bit resolution.
@@ -397,28 +382,26 @@ In order to read the magnetometer, we:
   to take measurements.
 \end{enumerate}
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\textwidth]{imu_single_measurement.png}
+  \caption{IMU single measurement mode}
+  \label{fig:imu_single_measurement}
+\end{figure}
+
 In order to calibrate the compass, the robots spun in place when powered
-on. They recorded the maximum and minimum values for each axes, and used
+on.
+They recorded the maximum and minimum values for each axes, and used
 that data to scale and center the magnetometer readings.
 
 \paragraph{Servos}
 
-For the drive system, we used the FS90R servos. These servos are
-continuous rotation servos with a stall torque of 1.5 kg-cm. Continuous
-rotation servos operate based on PWM duty cycle; since servos operate at
-a pulse width of 1 to 2 ms out of 20 ms, we used a timer with a
-prescaler of 32 and a maximum count of 25600, and set the pwm at numbers
-ranging from 1280 to 2560 (corresponding to the right pulse width).
-
-A 50\% duty cycle means the servos are still. A less than 50\% duty
-cycle means the servo turns clockwise and a greater than 50\% duty cycle
-means the servo turns counter-clockwise. To implement the PWM, we use
-the output capture on the PIC. We set the duty cycle using the built in
-timers. We set a max and min duty cycle value which were experimentally
-derived. The middle point is the average of the two. Tank drive is used
-to control the system where both wheels are driven forward or point
-turns where one wheel is turned in one direction and one is turned in
-the other direction.
+For the drive system, we used FS90R servos.
+These servos are continuous rotation servos with a stall torque of 1.5 kg-cm.
+Like most servos, they are driven with PWM signals at 50 hertz (20 millisecond periods).
+A duty cycle with about 1.5 milliseconds on is roughly neutral.
+With the PIC32s running at 40 MHz, a prescaler of 32 and a maximum count of 25600 produces the required 50 hertz signal ($25600/\left(40\cdot 10^6 \frac{1}{\text{s}}/ 32 \right) = 0.02048 \text{ ms}$).
+The PWM values (in timer counts) thus ranged from ranging from 1280 to 2560.
 
 \paragraph{Gradient descent}
 
@@ -433,14 +416,15 @@ gradient descent. Figure \ref{fig:graddesc} shows 2 versions of the gradient des
   }
   \subfloat[Compensating gradient descent]{
       \includegraphics[width=0.5\textwidth]{turn_correction.png}
-    \label{fig:simplegrad}
+    \label{fig:compensatinggrad}
   }
   \caption{2 gradient descent algorithms. The initial state is \emph{measure RSSI twice, take average}.}
   \label{fig:graddesc}
 \end{figure}
 
-The purpose of the compensating algorithm was to allow the robots to recover faster after taking a wrong turn: if it just just moved forward and detected a
-weakened signal, turned, and still detected a weaker signal, then it must have turned the wrong way, so it does a 180. However, it did not prove much more accurate than randomized gradient descent, largely due to noisy readings from IMU and Bluetooth signal strength. As such, we used the simplified version.
+The purpose of the compensating algorithm (figure \ref{fig:compensatinggrad}) was to allow the robots to recover faster after taking a wrong turn: if a robot just just moved forward and detected a weaker signal, turned, and still detected a weaker signal, then it must have turned the wrong way, so it does a 180.
+However, it did not prove any more accurate than randomized gradient descent, largely due to noisy RSSI readings.
+As such, we used the simplified version.
 
 \subsection{Results}
 
@@ -448,19 +432,14 @@ In most cases, at least 1 of the 2 robots successfully made it to the
 base station. However, it was not as reliable as we initially hoped. One
 of the main reasons for this was the noise in RSSI measurements.
 
-We expected that RSSI would vary with distance according to the
-following relation:
-
-\(\text{RSSI} = A - 10 n \log(d)\)
-
-where \(A\) and \(n\) are RF propagation parameters in dBm, \(d\) is
-distance in meters, and RSSI is the measured RSSI in dBm. \cite{5415423}
-We experimented with RSSI measurements to determine how well they worked
-by taking 2 Bluetooth modules, and measuring the RSSI while changing the
-distance between them. One remained stationary on the floor and the
-other was moved away from it 1 floor tile (each floor tile is a 1 foot
-square) at a time. At each point, we took 3 RSSI measurements and
-averaged them. Figure \ref{fig:rssiplot} shows the results (the original data is in table \ref{table:rssidata}).
+We expected that RSSI would vary with distance according to equation \ref{eq:rssi}:
+\begin{equation} \label{eq:rssi}
+  \text{RSSI} = A - 10 n \log(d),
+\end{equation}
+where $A$ and $n$ are RF propagation parameters in dBm, $d$ is distance in meters, and RSSI is the measured RSSI in dBm. \cite{5415423}
+We experimented with RSSI measurements to determine how well they worked by taking 2 Bluetooth modules, and measuring the RSSI while moving them apart.
+One remained stationary on the floor and the other was moved away from it 1 foot at a time.
+At each point, we took 3 RSSI measurements and averaged them. Figure \ref{fig:rssiplot} shows the results (the original data is in table \ref{table:rssidata}).
 
 \begin{figure}
   \centering
@@ -492,10 +471,10 @@ averaged them. Figure \ref{fig:rssiplot} shows the results (the original data is
 
 While the chip reported RSSI in units proportional to dBm, and we
 measured distances in feet, not meters, we could still use the above
-formula without worrying about unit conversions. The constants \(A\) and
-\(n\), provided we determined them empirically based on the data, would
+formula without worrying about unit conversions. The constants $A$ and
+$n$, provided we determined them empirically based on the data, would
 encode the conversions. As such, we fit the data using the above formula
-with \(A=-48\) and \(n=3\), resulting in the blue curve above. While the
+with $A=-48$ and $n=3$, resulting in the blue curve above. While the
 general shape of the curve matches, there is significant noise in the
 averaged RSSI data. Furthermore, when we tried to reproduce the
 measurements, we could not do so precisely -- it seemed to even depend
@@ -523,156 +502,154 @@ development:
 \begin{itemize}
 \tightlist
 \item
-  \emph{Communication between the two robots}. While Bluetooth may not
-  offer good distance measurement via RSSI, it can be used for reliable
-  communication between modules. It would be straightforward for one
-  hunting robot to inform the other whether it believes it is
-  approaching the beacon or not. In the simplest case, a hunting robot
-  that is approaching, or already at, the beacon can provide a second
-  point of reference for a currently hunting robot.
+  \emph{Communication between the two robots}. While Bluetooth may not offer good distance measurement via RSSI, it can be used for reliable  communication between modules.
+  It would be straightforward for one hunting robot to inform the other whether it believes it is approaching the beacon or not.
+  In the simplest case, a robot that is approaching, or already at, the beacon can provide a second point of reference for a currently hunting robot.
 \item
-  \emph{More complete usage of IMU}. Additional usage of the accelerometer and gyroscope, coupled with feedback from the servos, would allow the robots to maintain a dead-reckoning position estimate. This, paired with inter-swarm
-  communication, would make for a much more sophisticated and likely
-  much more efficient system. (Of course, this does not resolve the
-  shallow gradients problem -- but it would allow the approach to the
-  beacon to be much faster.)
+  \emph{More complete usage of IMU}. Additional usage of the accelerometer and gyroscope, coupled with feedback from the servos, would allow the robots to maintain a dead-reckoning position estimate.
+  This, paired with inter-swarm communication, would make for a much more sophisticated and likely much more efficient system.
+  (Of course, this does not resolve the shallow gradients problem -- but it would allow the approach to the beacon to be much faster.)
 \end{itemize}
-
-\subsubsection{Appendix A: Bill Of Materials}
-
-This project was done with a \$150 budget in mind. Costs for parts labeled ``Lab rental'' were borrowed from the department of Electrical and Computer Engineering at Cornell University, but can also be found at vendors like Digikey, Adafruit, and Amazon.
-
-\begin{longtable}[]{@{}lllllll@{}}
-\toprule
-\begin{minipage}[b]{0.15\columnwidth}\raggedright
-Name\strut
-\end{minipage} & \begin{minipage}[b]{0.15\columnwidth}\raggedright
-Manufacturer Part Number\strut
-\end{minipage} & \begin{minipage}[b]{0.10\columnwidth}\raggedright
-Vendor\strut
-\end{minipage} & \begin{minipage}[b]{0.17\columnwidth}\raggedright
-Vendor Part Number\strut
-\end{minipage} & \begin{minipage}[b]{0.11\columnwidth}\raggedright
-Quantity\strut
-\end{minipage} & \begin{minipage}[b]{0.06\columnwidth}\raggedright
-Unit Cost\strut
-\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright
-Total Cost\strut
-\end{minipage}\tabularnewline
-\midrule
-\endhead
-\begin{minipage}[t]{0.15\columnwidth}\raggedright
-BLE 4.0 Module (TI CC2541)\strut
-\end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright
-HM-10\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright
-\href{https://www.ebay.com/itm/AT-09-BLE-Bluetooth-4-0-Uart-Transceiver-Module-CC2541-Central-Switching-HM-10/142425748901?ssPageName=STRK\%3AMEBIDX\%3AIT\&_trksid=p2057872.m2749.l2649}{Ebay}\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-142425748901\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright
-3\strut
-\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright
-\$3.99\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
-\$11.97\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.15\columnwidth}\raggedright
-FEETECH FS90R (pack of 2) Continuous Rotation Robotic Servo\strut
-\end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright
-FS90R\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright
-\href{https://www.amazon.com/gp/product/B074BFQC3Q/ref=oh_aui_detailpage_o06_s00?ie=UTF8\&psc=1}{Amazon}\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-B074BFQC3Q\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright
-2\strut
-\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright
-\$12.39\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
-\$24.78\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.15\columnwidth}\raggedright
-HiLetgo 9-Axis 9 DOF 16 Bit Gyroscope Acceleration Magnetic Sensor\strut
-\end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright
-MPU-9250\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright
-\href{https://www.amazon.com/HiLetgo-Gyroscope-Acceleration-Accelerator-Magnetometer/dp/B01I1J0Z7Y/ref=redir_mobile_desktop?_encoding=UTF8\&dpID=51nl2fcMh6L\&dpPl=1\&keywords=mpu\%209250\&pi=AC_SX236_SY340_QL65\&qid=1512564044\&ref=plSrch\&ref_=mp_s_a_1_3\&sr=8-3}{Amazon}\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-B01I1J0Z7Y\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright
-2\strut
-\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright
-\$8.49\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
-\$16.98\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.15\columnwidth}\raggedright
-Small board\strut
-\end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright
---\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright
-Lab rental\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
---\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright
-3\strut
-\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright
-\$5.00\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
-\$15.00\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.15\columnwidth}\raggedright
-PIC32MX250F128B\strut
-\end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright
-PIC32MX250F128B\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright
-Lab rental\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
---\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright
-3\strut
-\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright
-\$5.00\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
-\$15.00\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.15\columnwidth}\raggedright
-6-inch Protoboard\strut
-\end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright
---\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright
-Lab rental\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
---\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright
-3\strut
-\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright
-\$2.50\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
-\$7.50\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.15\columnwidth}\raggedright
-Male header pins\strut
-\end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright
---\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright
-Lab\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
---\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright
-129\strut
-\end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright
-\$0.05\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
-\$6.45\strut
-\end{minipage}\tabularnewline
-\bottomrule
-\end{longtable}
-
-\textbf{Total:} \$97.68
 
 \bibliography{references}{}
 \bibliographystyle{ieeetr}
 
+
+\begin{appendices}
+  \section{Bill Of Materials}
+  This project was done with a \$150 budget in mind. Costs for parts labeled ``Lab rental'' were borrowed from the department of Electrical and Computer Engineering at Cornell University, but can also be found at vendors like Digikey, Adafruit, and Amazon.
+
+  \begin{centering}
+  \tiny
+  \begin{longtable}[]{@{}lllllll@{}}
+  \toprule
+  \begin{minipage}[b]{0.15\columnwidth}\raggedright
+  Name\strut
+  \end{minipage} & \begin{minipage}[b]{0.15\columnwidth}\raggedright
+  Manufacturer Part Number\strut
+  \end{minipage} & \begin{minipage}[b]{0.10\columnwidth}\raggedright
+  Vendor\strut
+  \end{minipage} & \begin{minipage}[b]{0.17\columnwidth}\raggedright
+  Vendor Part Number\strut
+  \end{minipage} & \begin{minipage}[b]{0.11\columnwidth}\raggedright
+  Quantity\strut
+  \end{minipage} & \begin{minipage}[b]{0.06\columnwidth}\raggedright
+  Unit Cost\strut
+  \end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright
+  Total Cost\strut
+  \end{minipage}\tabularnewline
+  \midrule
+  \endhead
+  \begin{minipage}[t]{0.15\columnwidth}\raggedright
+  BLE 4.0 Module (TI CC2541)\strut
+  \end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright
+  HM-10\strut
+  \end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright
+  \href{https://www.ebay.com/itm/AT-09-BLE-Bluetooth-4-0-Uart-Transceiver-Module-CC2541-Central-Switching-HM-10/142425748901?ssPageName=STRK\%3AMEBIDX\%3AIT\&_trksid=p2057872.m2749.l2649}{Ebay}\strut
+  \end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+  142425748901\strut
+  \end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright
+  3\strut
+  \end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright
+  \$3.99\strut
+  \end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+  \$11.97\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.15\columnwidth}\raggedright
+  FEETECH FS90R (pack of 2) Continuous Rotation Robotic Servo\strut
+  \end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright
+  FS90R\strut
+  \end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright
+  \href{https://www.amazon.com/gp/product/B074BFQC3Q/ref=oh_aui_detailpage_o06_s00?ie=UTF8\&psc=1}{Amazon}\strut
+  \end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+  B074BFQC3Q\strut
+  \end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright
+  2\strut
+  \end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright
+  \$12.39\strut
+  \end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+  \$24.78\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.15\columnwidth}\raggedright
+  HiLetgo 9-Axis 9 DOF 16 Bit Gyroscope Acceleration Magnetic Sensor\strut
+  \end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright
+  MPU-9250\strut
+  \end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright
+  \href{https://www.amazon.com/HiLetgo-Gyroscope-Acceleration-Accelerator-Magnetometer/dp/B01I1J0Z7Y/ref=redir_mobile_desktop?_encoding=UTF8\&dpID=51nl2fcMh6L\&dpPl=1\&keywords=mpu\%209250\&pi=AC_SX236_SY340_QL65\&qid=1512564044\&ref=plSrch\&ref_=mp_s_a_1_3\&sr=8-3}{Amazon}\strut
+  \end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+  B01I1J0Z7Y\strut
+  \end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright
+  2\strut
+  \end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright
+  \$8.49\strut
+  \end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+  \$16.98\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.15\columnwidth}\raggedright
+  Small board\strut
+  \end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright
+  --\strut
+  \end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright
+  Lab rental\strut
+  \end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+  --\strut
+  \end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright
+  3\strut
+  \end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright
+  \$5.00\strut
+  \end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+  \$15.00\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.15\columnwidth}\raggedright
+  PIC32MX250F128B\strut
+  \end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright
+  PIC32MX250F128B\strut
+  \end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright
+  Lab rental\strut
+  \end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+  --\strut
+  \end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright
+  3\strut
+  \end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright
+  \$5.00\strut
+  \end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+  \$15.00\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.15\columnwidth}\raggedright
+  6-inch Protoboard\strut
+  \end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright
+  --\strut
+  \end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright
+  Lab rental\strut
+  \end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+  --\strut
+  \end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright
+  3\strut
+  \end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright
+  \$2.50\strut
+  \end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+  \$7.50\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.15\columnwidth}\raggedright
+  Male header pins\strut
+  \end{minipage} & \begin{minipage}[t]{0.15\columnwidth}\raggedright
+  --\strut
+  \end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright
+  Lab\strut
+  \end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+  --\strut
+  \end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright
+  129\strut
+  \end{minipage} & \begin{minipage}[t]{0.06\columnwidth}\raggedright
+  \$0.05\strut
+  \end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+  \$6.45\strut
+  \end{minipage}\tabularnewline
+  \bottomrule
+  \end{longtable}
+  \end{centering}
+
+  \textbf{Total:} \$97.68
+\end{appendices}
 
 \end{document}
