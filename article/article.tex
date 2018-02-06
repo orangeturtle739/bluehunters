@@ -446,6 +446,21 @@ At each point, we took 3 RSSI measurements and averaged them. Figure \ref{fig:rs
 \end{tabular}
 \end{table}
 
+\begin{table}[]
+\centering
+\ra{1.3}
+\caption{Average convergence behavior}
+\label{table:averagecon}
+\begin{tabular}{@{}lll@{}}
+\toprule
+                       & Robot 0        & Robot 1     \\ \midrule
+Convergence time (s)   & 146            & 115         \\
+Convergence rate       & 60 \%          & 100 \%      \\
+Final distance (cm)    & 35             & 27          \\
+Failure distance (cm)  & 308            & --          \\ \bottomrule
+\end{tabular}
+\end{table}
+
 While the chip reported RSSI in units proportional to dBm, and we
 measured distances in feet, not meters, we could still use the above
 formula without worrying about unit conversions. The constants $A$ and
