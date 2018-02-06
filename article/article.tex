@@ -76,7 +76,6 @@
 \usepackage{graphicx,grffile}
 \graphicspath{{../assets/}{../renderings/}{../schematics/}}
 \usepackage{subfig}
-\usepackage{float}
 \usepackage[page]{appendix}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -192,9 +191,7 @@ The full source code is available in online: \url{https://github.com/orangeturtl
 
 \subsubsection{Signal Detection: Bluetooth Modules}
 
-% Jnhuamao is the company which makes the HM-10 module, along with other Bluetooth modules. Their English website is: \url{http://www.jnhuamao.cn/bluetooth.asp?id=1}.
-
-The HM-10 bluetooth modules we bought off Ebay were fakes: they were not made by Jnhuamao , and did not come with genuine Jnhuamao firmware.
+The HM-10 bluetooth modules we bought off Ebay were fakes: they were not made by Jnhuamao \cite{jnhuamao}, the manufacturer of the HM-10 module we intended to use. The modules we bought did not come with genuine Jnhuamao firmware.
 However, they did have genuine TI CC2541 chips.
 We realized they were fakes when they did not behave according to
 the Jnhuamao data sheet at \cite{jnhuamaodatasheet},
