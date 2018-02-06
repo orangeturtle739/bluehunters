@@ -125,12 +125,7 @@ Figure \ref{fig:robotsystem} shows the entire system.
 
 \subsection{Design}
 
-\subsubsection{Chassis}
-
-% Possible subsections?
-% - building robot
-% - signal detection
-% - navigation
+\subsubsection{Building the Robot}
 
 The robots are made from 4 3D printed pieces: 2 wheels, the frame, and
 the caster in the back.
@@ -160,39 +155,8 @@ The parts were printed in ABS using Maker Select 3D Printer v2 printers.
 All parts were printed with a layer height of 0.3 mm, as there was no need for a smooth finish or high tolerances.
 The parts were designed in OpenSCAD, and sliced with Cura.
 
-\begin{figure}
-  \centering
-  \subfloat[Top view]{
-    \includegraphics[width=0.4\textwidth]{top_view.jpg}
-    \label{fig:robottop}
-  }
-  \subfloat[Side view]{
-    \includegraphics[width=0.4\textwidth]{side_view.jpg}
-    \label{fig:robotside}
-  }
-  \\
-  \subfloat[Front view]{
-    \includegraphics[width=0.4\textwidth]{front_view.jpg}
-    \label{fig:robotfront}
-  }
-  \subfloat[Back view]{
-    \includegraphics[width=0.4\textwidth]{inside_view.jpg}
-    \label{fig:robotback}
-  }
-  \caption{Multiple views of the completed robots}
-  \label{fig:robotviews}
-\end{figure}
-
-\hypertarget{electronics}{%
-\subsubsection{Electronics}\label{electronics}}
-
-Each robot consisted of 4 main components:
-\begin{enumerate}
-  \item PIC32MC250F128B microcontroller.
-  \item MPU-9250 IMU with a 3 axis gryoscope, accelerometer, and magnetometer.
-  \item HM-10 BLE module with a Texas Instruments CC2541 chip.
-  \item Two 9 gram FS90R micro continuous rotation servos.
-\end{enumerate}
+% TODO: move around to be more top-down
+Each robot consisted of 4 main components: a PIC32MC250F128B microcontroller, a MPU-9250 IMU with a 3 axis gryoscope, accelerometer, and magnetometer, a HM-10 BLE module with a Texas Instruments CC2541 chip, and two 9 gram FS90R micro continuous rotation servos.
 
 The PIC32 and supporting circuity was on a small PCB (the ``Small Dev Board'' from ECE 4760 at Cornell University, the class during which we built this) shown in figure \ref{fig:schematic-sdb}. The rest of the components were assembled on solderable breadboard as shown in figure \ref{fig:schematic-robot}.
 
@@ -211,16 +175,28 @@ The PIC32 and supporting circuity was on a small PCB (the ``Small Dev Board'' fr
   \label{fig:schematic}
 \end{figure}
 
-\paragraph{Bluetooth modules}
 
-The HM-10 bluetooth modules we bought off Ebay were fakes: they were not made by Jnhuamao,
-\footnote{Jnhuamao is the company which makes the HM-10 module, along with other Bluetooth modules. Their English website is: \url{http://www.jnhuamao.cn/bluetooth.asp?id=1}.}
-and did not come with genuine Jnhuamao firmware.
+For the drive system, we used FS90R servos.
+These servos are continuous rotation servos with a stall torque of 1.5 kg-cm.
+Like most servos, they are driven with PWM signals at 50 hertz (20 millisecond periods).
+A duty cycle with about 1.5 milliseconds on is roughly neutral.
+With the PIC32s running at 40 MHz, a prescaler of 32 and a maximum count of 25600 produces the required 50 hertz signal ($25600/\left(40\cdot 10^6 \frac{1}{\text{s}}/ 32 \right) = 0.02048 \text{ ms}$).
+The PWM values (in timer counts) thus ranged from ranging from 1280 to 2560.
+
+
+The robots were programmed in C, using MPLAB X IDE v4.0, the XC32 v1.4
+compiler and the PIC 32 Legacy Peripheral Library (plib).
+The full source code is available in online: \url{https://github.com/orangeturtle739/bluehunters/tree/master/ble.X}
+
+\subsubsection{Signal Detection: Bluetooth Modules}
+
+% Jnhuamao is the company which makes the HM-10 module, along with other Bluetooth modules. Their English website is: \url{http://www.jnhuamao.cn/bluetooth.asp?id=1}.
+
+The HM-10 bluetooth modules we bought off Ebay were fakes: they were not made by Jnhuamao , and did not come with genuine Jnhuamao firmware.
 However, they did have genuine TI CC2541 chips.
 We realized they were fakes when they did not behave according to
-the Jnhuamao data sheet.
-\footnote{The original data sheet comes from \cite{jnhuamaodatasheet}.
-A PDF is available at \cite{jnhuamaomit}, which may be out of date, but is eaiser to get.}
+the Jnhuamao data sheet at \cite{jnhuamaodatasheet}, 
+with a PDF available at \cite{jnhuamaomit}, which may be out of date, but is easier to get.
 Luckily, the hardware on the fake chips is the same as that of the genuine chips, minus an external crystal, and the genuine firmware checks for the presence of the crystal, and works even without
 it. \cite{crystal}
 As such, we reprogrammed the chips with the genuine firmware according
@@ -288,18 +264,12 @@ Based on their instructions \cite{jnhuamaoinstructions}, we flashed our chips:
   information.
 \end{enumerate}
 
-\subsection{Software}
-
-The robots were programmed in C, using MPLAB X IDE v4.0, the XC32 v1.4
-compiler and the PIC 32 Legacy Peripheral Library (plib). \footnote{
-The full source code is available in online: \url{https://github.com/orangeturtle739/bluehunters/tree/master/ble.X}}
-
-\subsubsection{BLE}
-
 The BLE module used UART, at 9600 baud 8N1. We used \texttt{UART1} on
 the PIC for communicating with the BLE module, and used \texttt{UART2}
 for communicating with the computer (for debugging).
 We used the following commands to interact with the bluetooth chip:
+
+% TODO: Tablify
 
 \begin{itemize}
 \item
@@ -361,33 +331,20 @@ OK+DISC:00000000:00000000000000000000000000000000:
 One interesting thing to note about the chip is that commands do not have to end with newlines or carriage returns.
 However, if sent, the chip will ignore them.
 
-\paragraph{IMU}
+\subsubsection{Navigation}
 
-The PIC communicates with the IMU via I2C. The QFN MPU-9250 \cite{mpu9250datasheet} \cite{mpu9250regmap} module has 2 dies:
-one contains the 3-axis gyroscope and 3-axis accelerometer, which were not
-used in this project, and the other die is the AK8963 3-axis
-magnetometer (compass). \cite{ak8963cdatasheet}
+After measuring the proximity to the beacon, the robots would need to move towards it. The robot made use of the magnetometer (compass) inside the IMU to orient itself, and the gradient descent algorithm to decide the direction of its next movement.
 
-The compass is connected to the rest of the MPU module via an auxiliary I2C bus.
-In order to make the compass an accessible slave on the I2C bus, pass-through mode to be enabled on the IMU.
-\footnote{We based our IMU code off of another ECE 4760 project, the Self-Balancing Robot. \cite{selfbalancingrobot} Their \texttt{i2c\_helper.h} was very helpful.}
+For the IMU, we used the QFN MPU-9250 \cite{mpu9250datasheet} \cite{mpu9250regmap} module. It has 2 dies: one is the AK8963 3-axis magnetometer \cite{ak8963cdatasheet}, and the other contains the 3-axis gyroscope and 3-axis accelerometer, which were not used in this project.
+
+The microcontroller communicates with the IMU via I2C, and the compass is connected to the rest of the MPU module via an auxiliary I2C bus. For communication between the microcontroller and the AK8963's main die, we based our work off of basic I2C functions from another ECE 4760 project, the Self-Balancing Robot \cite{selfbalancingrobot}. In particular, their \texttt{i2c\_helper.h} was very helpful.
+
+For communication with the actual magnetometer, we needed to configure the IMU to set the compass must as a slave on the I2C bus. For this, it was necessary to enable pass-through mode on the IMU during its configuration.
+
 The AK8963 has several modes of operation, and the chip must be set to power-down mode before switching to other modes.
-We read compass values with single measurement mode, as in figure \ref{fig:imu_single_measurement}:
+We read compass values with single measurement mode, as in figure \ref{fig:imu_single_measurement}.
 
-\begin{enumerate}
-\item
-  Set the compass to single measurement mode in 14 bit resolution.
-\item
-  Read the 6 data registers (X low, X high, Y low, Y high, Z low, Z
-  high)
-\item
-  Read the Status 2 register to check for magnetic sensor overflow.
-  Without reading this register, the read is not considered complete and
-  further reads will fail.
-\item
-  Wait; if the IMU is read too frequently, it will not have enough time
-  to take measurements.
-\end{enumerate}
+A single compass read involves setting the compass to single measurement mode in 14 bit resolution, reading the 6 data registers (X low, X high, Y low, Y high, Z low, Z high), reading the Status 2 register to check for magnetic sensor overflow (without reading this register, the read is not considered complete and further reads will fail), and finally waiting to ensure that the IMU is not read too frequently, in which case it will not have enough time to take measurements.
 
 \begin{figure}
   \centering
@@ -400,17 +357,6 @@ In order to calibrate the compass, the robots spun in place when powered
 on.
 They recorded the maximum and minimum values for each axes, and used
 that data to scale and center the magnetometer readings.
-
-% \paragraph{Servos}
-
-For the drive system, we used FS90R servos.
-These servos are continuous rotation servos with a stall torque of 1.5 kg-cm.
-Like most servos, they are driven with PWM signals at 50 hertz (20 millisecond periods).
-A duty cycle with about 1.5 milliseconds on is roughly neutral.
-With the PIC32s running at 40 MHz, a prescaler of 32 and a maximum count of 25600 produces the required 50 hertz signal ($25600/\left(40\cdot 10^6 \frac{1}{\text{s}}/ 32 \right) = 0.02048 \text{ ms}$).
-The PWM values (in timer counts) thus ranged from ranging from 1280 to 2560.
-
-% \paragraph{Gradient descent}
 
 The algorithm for deciding what path to follow is a basic version of
 gradient descent. Figure \ref{fig:graddesc} shows 2 versions of the gradient descent algorithm.
@@ -496,12 +442,14 @@ minutes.
 
 This project was an interesting exploration into short-range distance
 determination using Bluetooth, a generally unconventional approach.
-We knew that Bluetooth RSSI would be noisy, mostly due to multipath interference.
+We knew that Bluetooth RSSI would be noisy, mostly due to multipath interference and the presence of multiple transmitters in testing environments.
 The robots worked reliably when they stayed within roughly 1 meter of the beacon.
 After this, they entered the land of shallow gradients:
 the signal strength from the beacon (already noisy) would not change very
 much, and often only due to noise.
 They normally could never recover from this.
+
+
 
 There are many potential avenues for improvements or further
 development.
