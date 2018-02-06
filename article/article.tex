@@ -108,6 +108,8 @@
 \hypertarget{introduction}{%
 \subsection{Introduction}\label{introduction}}
 
+% TODO: motivation, RSSI, fake chips
+
 In this article, we investigate using the Received Signal Strength Indicator (RSSI) of Bluetooth Low Energy (BLE) 4.0 chips to allow wheeled mobile robots to navigate towards a stationary base station.
 Each robot was controlled by a PIC32MX250 microcontroller, and used a 3 axis magnetometer as as compass in order to reliably turn, as well as 2 micro 9 g servos to drive.
 Each unit was powered with 3 AA batteries.
@@ -121,9 +123,14 @@ Figure \ref{fig:robotsystem} shows the entire system.
   \label{fig:robotsystem}
 \end{figure}
 
-\subsection{Hardware}
+\subsection{Design}
 
 \subsubsection{Chassis}
+
+% Possible subsections?
+% - building robot
+% - signal detection
+% - navigation
 
 The robots are made from 4 3D printed pieces: 2 wheels, the frame, and
 the caster in the back.
@@ -394,7 +401,7 @@ on.
 They recorded the maximum and minimum values for each axes, and used
 that data to scale and center the magnetometer readings.
 
-\paragraph{Servos}
+% \paragraph{Servos}
 
 For the drive system, we used FS90R servos.
 These servos are continuous rotation servos with a stall torque of 1.5 kg-cm.
@@ -403,7 +410,7 @@ A duty cycle with about 1.5 milliseconds on is roughly neutral.
 With the PIC32s running at 40 MHz, a prescaler of 32 and a maximum count of 25600 produces the required 50 hertz signal ($25600/\left(40\cdot 10^6 \frac{1}{\text{s}}/ 32 \right) = 0.02048 \text{ ms}$).
 The PWM values (in timer counts) thus ranged from ranging from 1280 to 2560.
 
-\paragraph{Gradient descent}
+% \paragraph{Gradient descent}
 
 The algorithm for deciding what path to follow is a basic version of
 gradient descent. Figure \ref{fig:graddesc} shows 2 versions of the gradient descent algorithm.
@@ -497,19 +504,15 @@ much, and often only due to noise.
 They normally could never recover from this.
 
 There are many potential avenues for improvements or further
-development:
+development.
 
-\begin{itemize}
-\tightlist
-\item
-  \emph{Communication between the two robots}. While Bluetooth may not offer good distance measurement via RSSI, it can be used for reliable  communication between modules.
-  It would be straightforward for one hunting robot to inform the other whether it believes it is approaching the beacon or not.
-  In the simplest case, a robot that is approaching, or already at, the beacon can provide a second point of reference for a currently hunting robot.
-\item
-  \emph{More complete usage of IMU}. Additional usage of the accelerometer and gyroscope, coupled with feedback from the servos, would allow the robots to maintain a dead-reckoning position estimate.
-  This, paired with inter-swarm communication, would make for a much more sophisticated and likely much more efficient system.
-  (Of course, this does not resolve the shallow gradients problem -- but it would allow the approach to the beacon to be much faster.)
-\end{itemize}
+Firstly, \emph{Communication between the two robots}: while Bluetooth may not offer good distance measurement via RSSI, it can be used for reliable  communication between modules.
+It would be straightforward for one hunting robot to inform the other whether it believes it is approaching the beacon or not.
+In the simplest case, a robot that is approaching, or already at, the beacon can provide a second point of reference for a currently hunting robot.
+
+Also, \emph{More complete usage of IMU}: additional usage of the accelerometer and gyroscope, coupled with feedback from the servos, would allow the robots to maintain a dead-reckoning position estimate.
+This, paired with inter-swarm communication, would make for a much more sophisticated and likely much more efficient system.
+(Of course, this does not resolve the shallow gradients problem -- but it would allow the approach to the beacon to be much faster.)
 
 \bibliography{references}{}
 \bibliographystyle{ieeetr}
