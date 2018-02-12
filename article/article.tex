@@ -126,12 +126,12 @@ Figure \ref{fig:robotsystem} shows the entire system.
 
 \subsection{Design}
 
-\subsubsection{Building the Robot}
-
-The robots are made from 4 3D printed pieces: 2 wheels, the frame, and
-the caster in the back.
-Figure \ref{fig:robotchassis} shows the main components.
-The servos, a 3 AA battery holder, and a perfboard containing all the circuitry are mounted directly to the frame.
+The system consists of 2 robots, and a base station.
+We designed the robots to be small, light, and maneuverable.
+Each robot has 2 wheels, driven by a 9 gram micro servo, as well as a third round plastic leg, serving as a caster wheel.
+We 3D printed the robot's frame in ABS, resulting in an easy to assemble robot.
+After printing the parts, we mounted a 3 AA battery pack to the frame to provide power,
+and screwed in a perfboard on standoffs. See \ref{fig:robotchassis} for the parts in each robot.
 
 \begin{figure}
   \centering
@@ -152,14 +152,10 @@ The servos, a 3 AA battery holder, and a perfboard containing all the circuitry 
   \label{fig:robotchassis}
 \end{figure}
 
-The parts were printed in ABS using Maker Select 3D Printer v2 printers.
-All parts were printed with a layer height of 0.3 mm, as there was no need for a smooth finish or high tolerances.
-The parts were designed in OpenSCAD, and sliced with Cura.
-
-% TODO: move around to be more top-down
-Each robot consisted of 4 main components: a PIC32MC250F128B microcontroller, a MPU-9250 IMU with a 3 axis gryoscope, accelerometer, and magnetometer, a HM-10 BLE module with a Texas Instruments CC2541 chip, and two 9 gram FS90R micro continuous rotation servos.
-
-The PIC32 and supporting circuity was on a small PCB (the ``Small Dev Board'' from ECE 4760 at Cornell University, the class during which we built this) shown in figure \ref{fig:schematic-sdb}. The rest of the components were assembled on solderable breadboard as shown in figure \ref{fig:schematic-robot}.
+The electronics for each robot consisted of 4 main components: a PIC32MC250F128B microcontroller, a MPU-9250 IMU with a 3 axis gryoscope, accelerometer, and magnetometer, a HM-10 BLE module with a Texas Instruments CC2541 chip, and two 9 gram FS90R micro continuous rotation servos.
+The BLE module connected to the PIC through a UART connection, and the IMU connected to the PIC through an I2C bus.
+The base station was identical to the robots, minus the IMU and servos.
+The HM-10 Bluetooth module was mounted perpendicular to the breadboard, sticking up in the air to hopefully improve the performance of the radio. Figure \ref{fig:schematic} provides a full schematic for one of the robots.
 
 \begin{figure}
   \centering
@@ -176,99 +172,57 @@ The PIC32 and supporting circuity was on a small PCB (the ``Small Dev Board'' fr
   \label{fig:schematic}
 \end{figure}
 
+While trying to use the Bluetooth modules (which we bought off Ebay), we discovered that they didn't adhere to the data sheet \cite{jnhuamaodatasheet}, and after doing some research, concluded they were fake!
+While the boards still had TI CC2541 chips, the firmware they were running was not the genuine Jnhuamao firmware.
+Luckily, the only difference between the fake boards and the genuine boards was that then genuine boards had an external crystal, but the genuine firmware checks for the presence of the crystal, and works even without it. \cite{crystal}
+Because of that, we were able to salvage the fake chips by reprogramming them with genuine firmware according to an Arduino Fourm post \cite{crystal}.
+Essentially, we connected the fake chips to an Arduino Teensy (which is 3.3 volts, and so won't damage the 3.3 volt CC2541) as indicated in table \ref{table:progpins}, using the schematic in figure \ref{fig:hm10} for reference.
 
-For the drive system, we used FS90R servos.
-These servos are continuous rotation servos with a stall torque of 1.5 kg-cm.
-Like most servos, they are driven with PWM signals at 50 hertz (20 millisecond periods).
-A duty cycle with about 1.5 milliseconds on is roughly neutral.
-With the PIC32s running at 40 MHz, a prescaler of 32 and a maximum count of 25600 produces the required 50 hertz signal ($25600/\left(40\cdot 10^6 \frac{1}{\text{s}}/ 32 \right) = 0.02048 \text{ ms}$).
-The PWM values (in timer counts) thus ranged from ranging from 1280 to 2560.
+\begin{table}[]
+  \centering
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    Name & CC2541 Pin & Arduino Pin\tabularnewline
+    \midrule
+    \texttt{DEBUG\_CLOCK} & 7 & 5\tabularnewline
+    \texttt{DEBUG\_DATA} & 8 & 6\tabularnewline
+    \texttt{RESET\_N} & 11 & 4\tabularnewline
+    \bottomrule
+  \end{tabular}
+  \caption{Arduino to CC2541 pin connections for programming.}
+  \label{table:progpins}
+\end{table}
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.3\textwidth]{hm10_pins.png}
+  \caption{HM-10 module pin layout \cite{crystal}}
+  \label{fig:hm10}
+\end{figure}
 
-The robots were programmed in C, using MPLAB X IDE v4.0, the XC32 v1.4
-compiler and the PIC 32 Legacy Peripheral Library (plib).
-The full source code is available in online: \url{https://github.com/orangeturtle739/bluehunters/tree/master/ble.X}
+Then, we uploaded the \texttt{CCLoader.ino} \cite{ccloader} sketch to the Arduino.
+This sketch bit bangs the programming signals for the CC2541/
+Finally, we ran (in a Windows virtual machine, due to the dubious origin of the software) \texttt{CCLoader.exe} \cite{ccloaderexe}:
+\begin{Verbatim}[gobble=2]
+  CCLoader.exe <COM Port> <Firmware.bin> 0
+\end{Verbatim}
+The firmware file came from the Arduino forum post. \cite{firmwarefile}
 
-\subsubsection{Signal Detection: Bluetooth Modules}
+Next, we updated the chips firmware from from 540, the version we just flashed onto it, to the latest (at the time we did this project) released version, 603. \cite{jnhuamao603}
+We connected the HM-10 module to a computer using a 3.3 V FTDI to USB adapter.
+Then, using PUTTY established a serial connection (9600 baud, 8N1) and sent the chip \texttt{AT}. If it is connected properly, it will respond with \texttt{OK}.
+Next, send the chip \texttt{AT+SBLUP} to put it in firmware update mode.
+It will respond with \texttt{OK+SBLUP}. Terminate the PUTTY session.
+Run the \texttt{HMSoft.exe} program distributed in the firmware update download.
+(Again in a Windows virtual machine, due to the dubious origin of the software.)
+Select the proper port and firmware file using the software, and hit ``Load Image''.
+The software should handle the rest!
+To make sure it worked, establish a serial connection again using PUTTY.
+Send \texttt{AT+VERS?} to query the chip for version information.
 
-The HM-10 bluetooth modules we bought off Ebay were fakes: they were not made by Jnhuamao \cite{jnhuamao}, the manufacturer of the HM-10 module we intended to use. The modules we bought did not come with genuine Jnhuamao firmware.
-However, they did have genuine TI CC2541 chips.
-We realized they were fakes when they did not behave according to
-the Jnhuamao data sheet at \cite{jnhuamaodatasheet},
-with a PDF available at \cite{jnhuamaomit}, which may be out of date, but is easier to get.
-Luckily, the hardware on the fake chips is the same as that of the genuine chips, minus an external crystal, and the genuine firmware checks for the presence of the crystal, and works even without
-it. \cite{crystal}
-As such, we reprogrammed the chips with the genuine firmware according
-to an Arduino Fourm post \cite{crystal}:
+% \cite{jnhuamaoinstructions}
 
-\begin{enumerate}
-\item
-  We soldered wires to the programming pins on the breakout boards, and connected those pins to an Arduino Teensy 3.2.
-  We chose a Teensy because it is 3.3 volts as opposed to 5, which would damage the 3.3 volt CC2541. The pins were connected as follows:
-
-  \begin{longtable}[]{@{}lll@{}}
-  \toprule
-  Name & CC2541 Pin & Arduino Pin\tabularnewline
-  \midrule
-  \endhead
-  \texttt{DEBUG\_CLOCK} & 7 & 5\tabularnewline
-  \texttt{DEBUG\_DATA} & 8 & 6\tabularnewline
-  \texttt{RESET\_N} & 11 & 4\tabularnewline
-  \bottomrule
-  \end{longtable}
-
-  Figure \ref{fig:hm10} shows the layout of the HM-10 module.
-  \begin{figure}
-    \centering
-    \includegraphics[width=0.3\textwidth]{hm10_pins.png}
-    \caption{HM-10 module pin layout \cite{crystal}}
-    \label{fig:hm10}
-  \end{figure}
-
-\item
-  We uploaded the \texttt{CCLoader.ino} \cite{ccloader} sketch to the Arduino.
-\item
-  Finally, we ran (in a Windows virtual machine, due to the dubious origin of the software) \texttt{CCLoader.exe} \cite{ccloaderexe}.
-  This program takes 3 arguments:
-
-  \begin{Verbatim}[gobble=4]
-    CCLoader.exe <COM Port> <Firmware.bin> 0
-  \end{Verbatim}
-
-  The firmware file came from the Arduino forum post. \cite{firmwarefile}
-\end{enumerate}
-
-After flashing genuine firmware onto the chip, the next step was to update the firmware to the latest version.
-The firmware flashed onto the board was version 540, but Jnhuamao had (at the time we did this project) released version 603. \cite{jnhuamao603}
-Based on their instructions \cite{jnhuamaoinstructions}, we flashed our chips:
-
-\begin{enumerate}
-\item
-  Connect the HM-10 module to a computer using a 3.3 V FTDI to USB
-  adapter. Then, use PUTTY to establish a serial session (9600 baud,
-  8N1). Send the chip \texttt{AT}; if it is connected properly, it will
-  respond with \texttt{OK}.
-\item
-  Send the chip \texttt{AT+SBLUP} to put it in firmware update mode. It
-  will respond with \texttt{OK+SBLUP}. Terminate the PUTTY session.
-\item
-  Run the \texttt{HMSoft.exe} program distributed in the firmware update
-  download. (Again in a Windows virtual machine, due to the dubious origin of the software.)
-\item
-  Select the proper port and firmware file using the software, and hit
-  ``Load Image''. The software should handle the rest!
-\item
-  To make sure it worked, establish a serial connection again using
-  PUTTY. Send \texttt{AT+VERS?} to query the chip for version
-  information.
-\end{enumerate}
-
-The BLE module used UART, at 9600 baud 8N1. We used \texttt{UART1} on
-the PIC for communicating with the BLE module, and used \texttt{UART2}
-for communicating with the computer (for debugging).
-We used the following commands to interact with the bluetooth chip:
-
-% TODO: Tablify
+At this point, we finally had the bluetooth chips in a working state.
 
 \begin{itemize}
 \item
