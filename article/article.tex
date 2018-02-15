@@ -109,9 +109,10 @@
 \hypertarget{introduction}{%
 \subsection{Introduction}\label{introduction}}
 
-% TODO: motivation, RSSI, fake chips
+Navigating through a plane is a problem with many diverse applications and solutions. We explore the approach of letting a robot use the strength of a broadcasted signal to locate itself. In particular, we investigate using the Received Signal Strength Indicator (RSSI) of Bluetooth Low Energy (BLE) 4.0 chips to allow wheeled mobile robots to navigate towards a stationary base station. The robot detects its proximity to the station based on the strength of the signal and moves towards what it believes to be the signal source. 
 
-In this article, we investigate using the Received Signal Strength Indicator (RSSI) of Bluetooth Low Energy (BLE) 4.0 chips to allow wheeled mobile robots to navigate towards a stationary base station.
+In the process of designing and building the hunting robots and the beacon, we encountered an interesting challenge in particular: fake Bluetooth modules from non-official vendors with usable hardware but out-of-date (and poorly documented) firmware. We explain the process we used to find, flash, and verify the correct firmware in order to use it for our project.
+
 Each robot was controlled by a PIC32MX250 microcontroller, and used a 3 axis magnetometer as as compass in order to reliably turn, as well as 2 micro 9 g servos to drive.
 Each unit was powered with 3 AA batteries.
 Finally, the chassis and wheels of each car were 3D printed.
@@ -126,9 +127,11 @@ Figure \ref{fig:robotsystem} shows the entire system.
 
 \subsection{Design}
 
-\subsubsection{Building the Robot}
+The design of the robots and beacon can be split into 3 rough categories: first, the construction of the robot itself, including the design of the chassis; second, the integration of the bluetooth modules that were used to transmit and receive signals, and lastly, the algorithm and sensors used by the robot to orient itself and move towards the source of the signal.
 
-The robots are made from 4 3D printed pieces: 2 wheels, the frame, and
+\subsubsection{Robot Construction}
+
+The robots themselves are made from 4 3D printed pieces: 2 wheels, the frame, and
 the caster in the back.
 Figure \ref{fig:robotchassis} shows the main components.
 The servos, a 3 AA battery holder, and a perfboard containing all the circuitry are mounted directly to the frame.
@@ -490,11 +493,11 @@ They normally could never recover from this.
 There are many potential avenues for improvements or further
 development.
 
-Firstly, \emph{Communication between the two robots}: while Bluetooth may not offer good distance measurement via RSSI, it can be used for reliable  communication between modules.
+Firstly, \emph{communication between the two robots}: while Bluetooth may not offer good distance measurement via RSSI, it can be used for reliable  communication between modules.
 It would be straightforward for one hunting robot to inform the other whether it believes it is approaching the beacon or not.
 In the simplest case, a robot that is approaching, or already at, the beacon can provide a second point of reference for a currently hunting robot.
 
-Also, \emph{More complete usage of IMU}: additional usage of the accelerometer and gyroscope, coupled with feedback from the servos, would allow the robots to maintain a dead-reckoning position estimate.
+Also, \emph{more complete usage of IMU}: additional usage of the accelerometer and gyroscope, coupled with feedback from the servos, would allow the robots to maintain a dead-reckoning position estimate.
 This, paired with inter-swarm communication, would make for a much more sophisticated and likely much more efficient system.
 (Of course, this does not resolve the shallow gradients problem -- but it would allow the approach to the beacon to be much faster.)
 
