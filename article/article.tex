@@ -69,6 +69,7 @@
 \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
 \newcommand{\NormalTok}[1]{#1}
 \usepackage{longtable,booktabs,multirow}
+\usepackage{tabularx}
 \newcommand{\ra}[1]{\renewcommand{\arraystretch}{#1}}
 
 % Fix footnotes in tables (requires footnote package)
@@ -223,72 +224,67 @@ Send \texttt{AT+VERS?} to query the chip for version information.
 % \cite{jnhuamaoinstructions}
 
 At this point, we finally had the bluetooth chips in a working state.
-
-\begin{itemize}
-\item
-  \texttt{AT+RESET}: resets the chip to ensure it is in a clean state
-  before receiving other commands.
-\item
-  \texttt{AT+IBEA1}: enables the iBeacon functionality of the chip (sets
-  it to 1; \texttt{AT+IBEA0} would disable it by setting it to 0). This
-  allows the chip to be found with an RSSI scan. After setting the
-  value, we query it with \texttt{AT+IBEA?} and send the result over the
-  other serial port to a computer for debugging.
-\item
-  \texttt{AT+ROLE0} or \texttt{AT+ROLE1}: sets the role to either
-  peripheral (0) or central (1). The base station is set to peripheral,
-  and the 2 robots are set to central. Peripheral means the device will
-  respond in inquiries from a central device. This allows it to be
-  discovered during an RSSI scan. After setting the value, we query it
-  with \texttt{AT+ROLE?} and send the result over the other serial port
-  to a computer for debugging.
-\item
-  \texttt{AT+IMME0} or \texttt{AT+IMME1}: sets the work state of the
-  device to either actively listening for Bluetooth signals (0), or only
-  acting when it receives a serial command (1). Once again, the base
-  station is set to 0: it needs to listen for signals and respond. The
-  robots are set to 1, as the chips need to initiate scan requests when
-  they receive the command over serial. After setting the value, we
-  query it with \texttt{AT+IMME?} and send the result over the other
-  serial port to a computer for debugging.
-\item
-  \texttt{AT+NAME\%s}: sets the name of the chip (which is visible when
-  scanning) to \texttt{\%s} (For example, \texttt{AT+NAMEPIRATE} names
-  the chip \texttt{PIRATE}). We give all the chips unique names to make
-  debugging easier. After setting the value, we query it with
-  \texttt{AT+NAME?} and send the result over the other serial port to a
-  computer for debugging.
-\item
-  \texttt{AT+SHOW3}: configures the device to advertise both its name
-  and RSSI when scanning.
-\item
-  \texttt{AT+ADDR?}: queries the device for its hardware address. We
-  recorded the hardware device of each chip, as when doing RSSI scans,
-  the results are reported by hardware address.
-\item
-  \texttt{AT+DISI?}: performed only on the robots, causing a discovery
-  scan. The result of the scan is a series of lines of the form:
-
-\begin{verbatim}
-OK+DISC:00000000:00000000000000000000000000000000:
-  0000000000:6832A3801EBE:-080
-\end{verbatim}
-
-  The second to last token, \texttt{6832A3801EBE}, is the hardware
-  address of the discovered device, and the last token, \texttt{-080},
-  is the measured RSSI. The chip will transmit a line for each device it
-  finds (``line'' is a misnomer as it does not separate them with any
-  characters), followed by \texttt{OK+DISCE}.
-\end{itemize}
-
+In order to have them measure signal strength, we sent it the sequence of commands
+shown in table \ref{table:blecommands} in order to obtain a signal strength measurement.
 One interesting thing to note about the chip is that commands do not have to end with newlines or carriage returns.
 However, if sent, the chip will ignore them.
 
-\subsubsection{Navigation}
+\begin{table}[]
+\centering
+\ra{1.3}
+\caption{HM-10 Bluetooth module signal strength measurement commands}
+\label{table:blecommands}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+\toprule
+Command & Description \\ \midrule
+\texttt{AT+RESET} & Resets the chip to ensure it is in a clean state
+before receiving other commands. \\
 
-After measuring the proximity to the beacon, the robots would need to move towards it. The robot made use of the magnetometer (compass) inside the IMU to orient itself, and the gradient descent algorithm to decide the direction of its next movement.
+\texttt{AT+IBEA1} & Sets the iBeacon functionality of the chip (1 on, 0 off).
+This allows the chip to be found with an RSSI scan. \\
 
-For the IMU, we used the QFN MPU-9250 \cite{mpu9250datasheet} \cite{mpu9250regmap} module. It has 2 dies: one is the AK8963 3-axis magnetometer \cite{ak8963cdatasheet}, and the other contains the 3-axis gyroscope and 3-axis accelerometer, which were not used in this project.
+\texttt{AT+ROLE\{0|1\}} & Sets the role to either peripheral (0) or central (1).
+The base station is set to peripheral, and the 2 robots are set to central.
+Peripheral means the device will respond in inquiries from a central device.
+This allows it to be discovered during an RSSI scan.\\
+
+\texttt{AT+IMME\{0|1\}} & Sets the work state of the device to either actively
+listening for Bluetooth signals (0), or only acting when it receives a serial
+command (1). Once again, the base station is set to 0: it needs to listen for
+signals and respond. The robots are set to 1, as the chips need to initiate scan
+requests when they receive the command over serial. \\
+
+\texttt{AT+NAME\{str\}} & Sets the name of the chip (which is visible when
+scanning) to the string \texttt{str} (For example, \texttt{AT+NAMEPIRATE} names
+the chip \texttt{PIRATE}). We give all the chips unique names to make
+debugging easier. \\
+
+\texttt{AT+SHOW3} & Configures the device to advertise both its name
+and RSSI when scanning. \\
+
+\texttt{AT+ADDR?} & Queries the device for its hardware address. We
+recorded the hardware device of each chip, as when doing RSSI scans,
+the results are reported by hardware address. \\
+
+\texttt{AT+DISI?} & Performed only on the robots, causing a discovery
+scan. The result of the scan is a series of lines of the form:
+{\begin{align*}
+&\mathtt{OK+DISC:00000000:00000000000000000000000000000000:}\\
+&\mathtt{  0000000000:6832A3801EBE:-080}
+\end{align*}}
+The second to last token, \texttt{6832A3801EBE}, is the hardware
+address of the discovered device, and the last token, \texttt{-080},
+is the measured RSSI. The chip will transmit a line for each device it
+finds (``line'' is a misnomer as it does not separate them with any
+characters), followed by \texttt{OK+DISCE}. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Once we had the Bluetooth signal strength working, we configured the IMU,
+a QFN MPU-9250 \cite{mpu9250datasheet} \cite{mpu9250regmap} module.
+It has 2 dies: one is the AK8963 3-axis magnetometer \cite{ak8963cdatasheet},
+and the other contains the 3-axis gyroscope and 3-axis accelerometer, which we did not use.
 
 The microcontroller communicates with the IMU via I2C, and the compass is connected to the rest of the MPU module via an auxiliary I2C bus. For communication between the microcontroller and the AK8963's main die, we based our work off of basic I2C functions from another ECE 4760 project, the Self-Balancing Robot \cite{selfbalancingrobot}. In particular, their \texttt{i2c\_helper.h} was very helpful.
 
@@ -307,12 +303,15 @@ A single compass read involves setting the compass to single measurement mode in
 \end{figure}
 
 In order to calibrate the compass, the robots spun in place when powered
-on.
-They recorded the maximum and minimum values for each axes, and used
+on. They recorded the maximum and minimum values for each axes, and used
 that data to scale and center the magnetometer readings.
 
-The algorithm for deciding what path to follow is a basic version of
-gradient descent. Figure \ref{fig:graddesc} shows 2 versions of the gradient descent algorithm.
+\subsubsection{Navigation}
+
+Once we had the robots working, we turned to the algorithm.
+Since they don't have much data -- only the last couple signal strength measurements --
+we decided to use a simple gradient descent algorithm.
+Figure \ref{fig:graddesc} shows 2 versions of the gradient descent algorithm.
 
 \begin{figure}
   \centering
@@ -334,9 +333,10 @@ As such, we used the simplified version.
 
 \subsection{Results}
 
-In most cases, at least 1 of the 2 robots successfully made it to the
-base station. However, it was not as reliable as we initially hoped. One
-of the main reasons for this was the noise in RSSI measurements.
+On average, when starting from 1 meter away, the robots successfully made it to the base station 80\% of the time,
+within an average time of 126 seconds.
+This wasn't as reliable, or as fast, as we initially hoped.
+One of the main reasons for this was the noise in RSSI measurements.
 
 We expected that RSSI would vary with distance according to equation \ref{eq:rssi}:
 \begin{equation} \label{eq:rssi}
@@ -423,10 +423,29 @@ averaged RSSI data. Furthermore, when we tried to reproduce the
 measurements, we could not do so precisely -- it seemed to even depend
 on where our feet where!
 
-Despite how noisy the RSSI measurements where, the robots were still
-able to perform a reasonably accurate gradient descent. In most cases,
-at least one of the 2 robots would find the beacon in a matter of
-minutes.
+Despite the noise in the RSSI readings, the robots did surprisingly well.
+We tested the robots by starting the both 1 meter from the base station,
+one on the north side, and one on the south side.
+After they started, we timed the amount of time it took them to arrive
+at the base station and flash their LEDs.
+We set a timeout of 5 minutes, at which point we would measure the
+distance between the robot and the base station.
+We also measured the distance when the robot arrived.
+All distances were measured between the Bluetooth modules.
+The results of this are displayed in table \ref{table:convergence},
+with averages in table \ref{table:averagecon}.
+
+There are some interesting patterns in the data.
+One obvious one is that robot 1 always made it,
+while robot 0 only had a 60\% success rate.
+In addition, when robot 1 made it, it was on average 8 centimeters
+closer than robot 0, and converged about 30 seconds faster!
+We think that perhaps the antennas on each had different sensitivities,
+as both used the same RSSI threshold for stopping once they reached the goal.
+Another interesting result is that when robot 0 failed, it was
+on average 3 meters away -- far off in the land of shallow gradients.
+The only way to recover from that was dumb luck, as the signal would have been
+dominated by noise that far away.
 
 \subsection{Conclusions}
 
