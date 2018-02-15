@@ -69,6 +69,7 @@
 \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
 \newcommand{\NormalTok}[1]{#1}
 \usepackage{longtable,booktabs,multirow}
+\usepackage{tabularx}
 \newcommand{\ra}[1]{\renewcommand{\arraystretch}{#1}}
 
 % Fix footnotes in tables (requires footnote package)
@@ -131,10 +132,12 @@ The design of the robots and beacon can be split into 3 rough categories: first,
 
 \subsubsection{Robot Construction}
 
-The robots themselves are made from 4 3D printed pieces: 2 wheels, the frame, and
-the caster in the back.
-Figure \ref{fig:robotchassis} shows the main components.
-The servos, a 3 AA battery holder, and a perfboard containing all the circuitry are mounted directly to the frame.
+The system consists of 2 robots, and a base station.
+We designed the robots to be small, light, and maneuverable.
+Each robot has 2 wheels, driven by a 9 gram micro servo, as well as a third round plastic leg, serving as a caster wheel.
+We 3D printed the robot's frame in ABS, resulting in an easy to assemble robot.
+After printing the parts, we mounted a 3 AA battery pack to the frame to provide power,
+and screwed in a perfboard on standoffs. See \ref{fig:robotchassis} for the parts in each robot.
 
 \begin{figure}
   \centering
@@ -155,14 +158,10 @@ The servos, a 3 AA battery holder, and a perfboard containing all the circuitry 
   \label{fig:robotchassis}
 \end{figure}
 
-The parts were printed in ABS using Maker Select 3D Printer v2 printers.
-All parts were printed with a layer height of 0.3 mm, as there was no need for a smooth finish or high tolerances.
-The parts were designed in OpenSCAD, and sliced with Cura.
-
-% TODO: move around to be more top-down
-Each robot consisted of 4 main components: a PIC32MC250F128B microcontroller, a MPU-9250 IMU with a 3 axis gryoscope, accelerometer, and magnetometer, a HM-10 BLE module with a Texas Instruments CC2541 chip, and two 9 gram FS90R micro continuous rotation servos.
-
-The PIC32 and supporting circuity was on a small PCB (the ``Small Dev Board'' from ECE 4760 at Cornell University, the class during which we built this) shown in figure \ref{fig:schematic-sdb}. The rest of the components were assembled on solderable breadboard as shown in figure \ref{fig:schematic-robot}.
+The electronics for each robot consisted of 4 main components: a PIC32MC250F128B microcontroller, a MPU-9250 IMU with a 3 axis gryoscope, accelerometer, and magnetometer, a HM-10 BLE module with a Texas Instruments CC2541 chip, and two 9 gram FS90R micro continuous rotation servos.
+The BLE module connected to the PIC through a UART connection, and the IMU connected to the PIC through an I2C bus.
+The base station was identical to the robots, minus the IMU and servos.
+The HM-10 Bluetooth module was mounted perpendicular to the breadboard, sticking up in the air to hopefully improve the performance of the radio. Figure \ref{fig:schematic} provides a full schematic for one of the robots.
 
 \begin{figure}
   \centering
@@ -179,165 +178,118 @@ The PIC32 and supporting circuity was on a small PCB (the ``Small Dev Board'' fr
   \label{fig:schematic}
 \end{figure}
 
+While trying to use the Bluetooth modules (which we bought off Ebay), we discovered that they didn't adhere to the data sheet \cite{jnhuamaodatasheet}, and after doing some research, concluded they were fake!
+While the boards still had TI CC2541 chips, the firmware they were running was not the genuine Jnhuamao firmware.
+Luckily, the only difference between the fake boards and the genuine boards was that then genuine boards had an external crystal, but the genuine firmware checks for the presence of the crystal, and works even without it. \cite{crystal}
+Because of that, we were able to salvage the fake chips by reprogramming them with genuine firmware according to an Arduino Fourm post \cite{crystal}.
+Essentially, we connected the fake chips to an Arduino Teensy (which is 3.3 volts, and so won't damage the 3.3 volt CC2541) as indicated in table \ref{table:progpins}, using the schematic in figure \ref{fig:hm10} for reference.
 
-For the drive system, we used FS90R servos.
-These servos are continuous rotation servos with a stall torque of 1.5 kg-cm.
-Like most servos, they are driven with PWM signals at 50 hertz (20 millisecond periods).
-A duty cycle with about 1.5 milliseconds on is roughly neutral.
-With the PIC32s running at 40 MHz, a prescaler of 32 and a maximum count of 25600 produces the required 50 hertz signal ($25600/\left(40\cdot 10^6 \frac{1}{\text{s}}/ 32 \right) = 0.02048 \text{ ms}$).
-The PWM values (in timer counts) thus ranged from ranging from 1280 to 2560.
+\begin{table}[]
+  \centering
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    Name & CC2541 Pin & Arduino Pin\tabularnewline
+    \midrule
+    \texttt{DEBUG\_CLOCK} & 7 & 5\tabularnewline
+    \texttt{DEBUG\_DATA} & 8 & 6\tabularnewline
+    \texttt{RESET\_N} & 11 & 4\tabularnewline
+    \bottomrule
+  \end{tabular}
+  \caption{Arduino to CC2541 pin connections for programming.}
+  \label{table:progpins}
+\end{table}
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.3\textwidth]{hm10_pins.png}
+  \caption{HM-10 module pin layout \cite{crystal}}
+  \label{fig:hm10}
+\end{figure}
 
-The robots were programmed in C, using MPLAB X IDE v4.0, the XC32 v1.4
-compiler and the PIC 32 Legacy Peripheral Library (plib).
-The full source code is available in online: \url{https://github.com/orangeturtle739/bluehunters/tree/master/ble.X}
+Then, we uploaded the \texttt{CCLoader.ino} \cite{ccloader} sketch to the Arduino.
+This sketch bit bangs the programming signals for the CC2541/
+Finally, we ran (in a Windows virtual machine, due to the dubious origin of the software) \texttt{CCLoader.exe} \cite{ccloaderexe}:
+\begin{Verbatim}[gobble=2]
+  CCLoader.exe <COM Port> <Firmware.bin> 0
+\end{Verbatim}
+The firmware file came from the Arduino forum post. \cite{firmwarefile}
 
-\subsubsection{Signal Detection: Bluetooth Modules}
+Next, we updated the chips firmware from from 540, the version we just flashed onto it, to the latest (at the time we did this project) released version, 603. \cite{jnhuamao603}
+We connected the HM-10 module to a computer using a 3.3 V FTDI to USB adapter.
+Then, using PUTTY established a serial connection (9600 baud, 8N1) and sent the chip \texttt{AT}. If it is connected properly, it will respond with \texttt{OK}.
+Next, send the chip \texttt{AT+SBLUP} to put it in firmware update mode.
+It will respond with \texttt{OK+SBLUP}. Terminate the PUTTY session.
+Run the \texttt{HMSoft.exe} program distributed in the firmware update download.
+(Again in a Windows virtual machine, due to the dubious origin of the software.)
+Select the proper port and firmware file using the software, and hit ``Load Image''.
+The software should handle the rest!
+To make sure it worked, establish a serial connection again using PUTTY.
+Send \texttt{AT+VERS?} to query the chip for version information.
 
-The HM-10 bluetooth modules we bought off Ebay were fakes: they were not made by Jnhuamao \cite{jnhuamao}, the manufacturer of the HM-10 module we intended to use. The modules we bought did not come with genuine Jnhuamao firmware.
-However, they did have genuine TI CC2541 chips.
-We realized they were fakes when they did not behave according to
-the Jnhuamao data sheet at \cite{jnhuamaodatasheet},
-with a PDF available at \cite{jnhuamaomit}, which may be out of date, but is easier to get.
-Luckily, the hardware on the fake chips is the same as that of the genuine chips, minus an external crystal, and the genuine firmware checks for the presence of the crystal, and works even without
-it. \cite{crystal}
-As such, we reprogrammed the chips with the genuine firmware according
-to an Arduino Fourm post \cite{crystal}:
+% \cite{jnhuamaoinstructions}
 
-\begin{enumerate}
-\item
-  We soldered wires to the programming pins on the breakout boards, and connected those pins to an Arduino Teensy 3.2.
-  We chose a Teensy because it is 3.3 volts as opposed to 5, which would damage the 3.3 volt CC2541. The pins were connected as follows:
-
-  \begin{longtable}[]{@{}lll@{}}
-  \toprule
-  Name & CC2541 Pin & Arduino Pin\tabularnewline
-  \midrule
-  \endhead
-  \texttt{DEBUG\_CLOCK} & 7 & 5\tabularnewline
-  \texttt{DEBUG\_DATA} & 8 & 6\tabularnewline
-  \texttt{RESET\_N} & 11 & 4\tabularnewline
-  \bottomrule
-  \end{longtable}
-
-  Figure \ref{fig:hm10} shows the layout of the HM-10 module.
-  \begin{figure}
-    \centering
-    \includegraphics[width=0.3\textwidth]{hm10_pins.png}
-    \caption{HM-10 module pin layout \cite{crystal}}
-    \label{fig:hm10}
-  \end{figure}
-
-\item
-  We uploaded the \texttt{CCLoader.ino} \cite{ccloader} sketch to the Arduino.
-\item
-  Finally, we ran (in a Windows virtual machine, due to the dubious origin of the software) \texttt{CCLoader.exe} \cite{ccloaderexe}.
-  This program takes 3 arguments:
-
-  \begin{Verbatim}[gobble=4]
-    CCLoader.exe <COM Port> <Firmware.bin> 0
-  \end{Verbatim}
-
-  The firmware file came from the Arduino forum post. \cite{firmwarefile}
-\end{enumerate}
-
-After flashing genuine firmware onto the chip, the next step was to update the firmware to the latest version.
-The firmware flashed onto the board was version 540, but Jnhuamao had (at the time we did this project) released version 603. \cite{jnhuamao603}
-Based on their instructions \cite{jnhuamaoinstructions}, we flashed our chips:
-
-\begin{enumerate}
-\item
-  Connect the HM-10 module to a computer using a 3.3 V FTDI to USB
-  adapter. Then, use PUTTY to establish a serial session (9600 baud,
-  8N1). Send the chip \texttt{AT}; if it is connected properly, it will
-  respond with \texttt{OK}.
-\item
-  Send the chip \texttt{AT+SBLUP} to put it in firmware update mode. It
-  will respond with \texttt{OK+SBLUP}. Terminate the PUTTY session.
-\item
-  Run the \texttt{HMSoft.exe} program distributed in the firmware update
-  download. (Again in a Windows virtual machine, due to the dubious origin of the software.)
-\item
-  Select the proper port and firmware file using the software, and hit
-  ``Load Image''. The software should handle the rest!
-\item
-  To make sure it worked, establish a serial connection again using
-  PUTTY. Send \texttt{AT+VERS?} to query the chip for version
-  information.
-\end{enumerate}
-
-The BLE module used UART, at 9600 baud 8N1. We used \texttt{UART1} on
-the PIC for communicating with the BLE module, and used \texttt{UART2}
-for communicating with the computer (for debugging).
-We used the following commands to interact with the bluetooth chip:
-
-% TODO: Tablify
-
-\begin{itemize}
-\item
-  \texttt{AT+RESET}: resets the chip to ensure it is in a clean state
-  before receiving other commands.
-\item
-  \texttt{AT+IBEA1}: enables the iBeacon functionality of the chip (sets
-  it to 1; \texttt{AT+IBEA0} would disable it by setting it to 0). This
-  allows the chip to be found with an RSSI scan. After setting the
-  value, we query it with \texttt{AT+IBEA?} and send the result over the
-  other serial port to a computer for debugging.
-\item
-  \texttt{AT+ROLE0} or \texttt{AT+ROLE1}: sets the role to either
-  peripheral (0) or central (1). The base station is set to peripheral,
-  and the 2 robots are set to central. Peripheral means the device will
-  respond in inquiries from a central device. This allows it to be
-  discovered during an RSSI scan. After setting the value, we query it
-  with \texttt{AT+ROLE?} and send the result over the other serial port
-  to a computer for debugging.
-\item
-  \texttt{AT+IMME0} or \texttt{AT+IMME1}: sets the work state of the
-  device to either actively listening for Bluetooth signals (0), or only
-  acting when it receives a serial command (1). Once again, the base
-  station is set to 0: it needs to listen for signals and respond. The
-  robots are set to 1, as the chips need to initiate scan requests when
-  they receive the command over serial. After setting the value, we
-  query it with \texttt{AT+IMME?} and send the result over the other
-  serial port to a computer for debugging.
-\item
-  \texttt{AT+NAME\%s}: sets the name of the chip (which is visible when
-  scanning) to \texttt{\%s} (For example, \texttt{AT+NAMEPIRATE} names
-  the chip \texttt{PIRATE}). We give all the chips unique names to make
-  debugging easier. After setting the value, we query it with
-  \texttt{AT+NAME?} and send the result over the other serial port to a
-  computer for debugging.
-\item
-  \texttt{AT+SHOW3}: configures the device to advertise both its name
-  and RSSI when scanning.
-\item
-  \texttt{AT+ADDR?}: queries the device for its hardware address. We
-  recorded the hardware device of each chip, as when doing RSSI scans,
-  the results are reported by hardware address.
-\item
-  \texttt{AT+DISI?}: performed only on the robots, causing a discovery
-  scan. The result of the scan is a series of lines of the form:
-
-\begin{verbatim}
-OK+DISC:00000000:00000000000000000000000000000000:
-  0000000000:6832A3801EBE:-080
-\end{verbatim}
-
-  The second to last token, \texttt{6832A3801EBE}, is the hardware
-  address of the discovered device, and the last token, \texttt{-080},
-  is the measured RSSI. The chip will transmit a line for each device it
-  finds (``line'' is a misnomer as it does not separate them with any
-  characters), followed by \texttt{OK+DISCE}.
-\end{itemize}
-
+At this point, we finally had the bluetooth chips in a working state.
+In order to have them measure signal strength, we sent it the sequence of commands
+shown in table \ref{table:blecommands} in order to obtain a signal strength measurement.
 One interesting thing to note about the chip is that commands do not have to end with newlines or carriage returns.
 However, if sent, the chip will ignore them.
 
-\subsubsection{Navigation}
+\begin{table}[]
+\centering
+\ra{1.3}
+\caption{HM-10 Bluetooth module signal strength measurement commands}
+\label{table:blecommands}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+\toprule
+Command & Description \\ \midrule
+\texttt{AT+RESET} & Resets the chip to ensure it is in a clean state
+before receiving other commands. \\
 
-After measuring the proximity to the beacon, the robots would need to move towards it. The robot made use of the magnetometer (compass) inside the IMU to orient itself, and the gradient descent algorithm to decide the direction of its next movement.
+\texttt{AT+IBEA1} & Sets the iBeacon functionality of the chip (1 on, 0 off).
+This allows the chip to be found with an RSSI scan. \\
 
-For the IMU, we used the QFN MPU-9250 \cite{mpu9250datasheet} \cite{mpu9250regmap} module. It has 2 dies: one is the AK8963 3-axis magnetometer \cite{ak8963cdatasheet}, and the other contains the 3-axis gyroscope and 3-axis accelerometer, which were not used in this project.
+\texttt{AT+ROLE\{0|1\}} & Sets the role to either peripheral (0) or central (1).
+The base station is set to peripheral, and the 2 robots are set to central.
+Peripheral means the device will respond in inquiries from a central device.
+This allows it to be discovered during an RSSI scan.\\
+
+\texttt{AT+IMME\{0|1\}} & Sets the work state of the device to either actively
+listening for Bluetooth signals (0), or only acting when it receives a serial
+command (1). Once again, the base station is set to 0: it needs to listen for
+signals and respond. The robots are set to 1, as the chips need to initiate scan
+requests when they receive the command over serial. \\
+
+\texttt{AT+NAME\{str\}} & Sets the name of the chip (which is visible when
+scanning) to the string \texttt{str} (For example, \texttt{AT+NAMEPIRATE} names
+the chip \texttt{PIRATE}). We give all the chips unique names to make
+debugging easier. \\
+
+\texttt{AT+SHOW3} & Configures the device to advertise both its name
+and RSSI when scanning. \\
+
+\texttt{AT+ADDR?} & Queries the device for its hardware address. We
+recorded the hardware device of each chip, as when doing RSSI scans,
+the results are reported by hardware address. \\
+
+\texttt{AT+DISI?} & Performed only on the robots, causing a discovery
+scan. The result of the scan is a series of lines of the form:
+{\begin{align*}
+&\mathtt{OK+DISC:00000000:00000000000000000000000000000000:}\\
+&\mathtt{  0000000000:6832A3801EBE:-080}
+\end{align*}}
+The second to last token, \texttt{6832A3801EBE}, is the hardware
+address of the discovered device, and the last token, \texttt{-080},
+is the measured RSSI. The chip will transmit a line for each device it
+finds (``line'' is a misnomer as it does not separate them with any
+characters), followed by \texttt{OK+DISCE}. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Once we had the Bluetooth signal strength working, we configured the IMU,
+a QFN MPU-9250 \cite{mpu9250datasheet} \cite{mpu9250regmap} module.
+It has 2 dies: one is the AK8963 3-axis magnetometer \cite{ak8963cdatasheet},
+and the other contains the 3-axis gyroscope and 3-axis accelerometer, which we did not use.
 
 The microcontroller communicates with the IMU via I2C, and the compass is connected to the rest of the MPU module via an auxiliary I2C bus. For communication between the microcontroller and the AK8963's main die, we based our work off of basic I2C functions from another ECE 4760 project, the Self-Balancing Robot \cite{selfbalancingrobot}. In particular, their \texttt{i2c\_helper.h} was very helpful.
 
@@ -356,12 +308,15 @@ A single compass read involves setting the compass to single measurement mode in
 \end{figure}
 
 In order to calibrate the compass, the robots spun in place when powered
-on.
-They recorded the maximum and minimum values for each axes, and used
+on. They recorded the maximum and minimum values for each axes, and used
 that data to scale and center the magnetometer readings.
 
-The algorithm for deciding what path to follow is a basic version of
-gradient descent. Figure \ref{fig:graddesc} shows 2 versions of the gradient descent algorithm.
+\subsubsection{Navigation}
+
+Once we had the robots working, we turned to the algorithm.
+Since they don't have much data -- only the last couple signal strength measurements --
+we decided to use a simple gradient descent algorithm.
+Figure \ref{fig:graddesc} shows 2 versions of the gradient descent algorithm.
 
 \begin{figure}
   \centering
@@ -383,9 +338,10 @@ As such, we used the simplified version.
 
 \subsection{Results}
 
-In most cases, at least 1 of the 2 robots successfully made it to the
-base station. However, it was not as reliable as we initially hoped. One
-of the main reasons for this was the noise in RSSI measurements.
+On average, when starting from 1 meter away, the robots successfully made it to the base station 80\% of the time,
+within an average time of 126 seconds.
+This wasn't as reliable, or as fast, as we initially hoped.
+One of the main reasons for this was the noise in RSSI measurements.
 
 We expected that RSSI would vary with distance according to equation \ref{eq:rssi}:
 \begin{equation} \label{eq:rssi}
@@ -472,10 +428,29 @@ averaged RSSI data. Furthermore, when we tried to reproduce the
 measurements, we could not do so precisely -- it seemed to even depend
 on where our feet where!
 
-Despite how noisy the RSSI measurements where, the robots were still
-able to perform a reasonably accurate gradient descent. In most cases,
-at least one of the 2 robots would find the beacon in a matter of
-minutes.
+Despite the noise in the RSSI readings, the robots did surprisingly well.
+We tested the robots by starting the both 1 meter from the base station,
+one on the north side, and one on the south side.
+After they started, we timed the amount of time it took them to arrive
+at the base station and flash their LEDs.
+We set a timeout of 5 minutes, at which point we would measure the
+distance between the robot and the base station.
+We also measured the distance when the robot arrived.
+All distances were measured between the Bluetooth modules.
+The results of this are displayed in table \ref{table:convergence},
+with averages in table \ref{table:averagecon}.
+
+There are some interesting patterns in the data.
+One obvious one is that robot 1 always made it,
+while robot 0 only had a 60\% success rate.
+In addition, when robot 1 made it, it was on average 8 centimeters
+closer than robot 0, and converged about 30 seconds faster!
+We think that perhaps the antennas on each had different sensitivities,
+as both used the same RSSI threshold for stopping once they reached the goal.
+Another interesting result is that when robot 0 failed, it was
+on average 3 meters away -- far off in the land of shallow gradients.
+The only way to recover from that was dumb luck, as the signal would have been
+dominated by noise that far away.
 
 \subsection{Conclusions}
 
